@@ -1,0 +1,102 @@
+version: "3"
+services:
+  webserver:
+    image: traefik:v2.10
+
+    ports:
+      - 81:81
+      - 8888:8080
+
+    labels:
+      - traefik.enable=true
+      - traefik.constraint-label=public
+
+      # GENERIC MIDDLEWARES
+      # - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
+      # - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+      - traefik.http.middlewares.gzip.compress=true
+      - traefik.http.middlewares.gzip.compress.excludedcontenttypes=image/png, image/jpeg, font/woff2
+
+      # GENERIC ROUTERS
+      # - traefik.http.routers.generic-https-redirect.entrypoints=http
+      # - traefik.http.routers.generic-https-redirect.rule=HostRegexp(`{host:.*}`)
+      # - traefik.http.routers.generic-https-redirect.priority=1
+      # - traefik.http.routers.generic-https-redirect.middlewares=https-redirect
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+    command:
+      - --providers.docker
+      - --providers.docker.constraints=Label(`traefik.constraint-label`, `public`)
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.http.address=:80
+      # - --entrypoints.https.address=:443
+      - --accesslog
+      - --accesslog.format=json
+      - --accesslog.fields.headers.names.X-Varnish-Routed=keep
+      - --accesslog.fields.headers.names.RequestHost=keep
+      - --log
+      - --log.level=DEBUG
+      - --api
+      
+  agencia:
+    image: ghcr.io/plonegovbr/portal:latest
+    ports:
+      - '3001:3000'
+    restart: always
+    labels:
+      - traefik.enable=true
+      #service
+      - traefik.http.services.plone-agencia.loadbalancer.server.port=3001
+      # HOST: main
+      - traefik.http.routers.agencia.rule=Host(`agencia.localhost`)
+      - traefik.http.routers.agencia.service=plone-agencia
+      - traefik.http.routers.agencia.middlewares=gzip
+    environment:
+      # These are needed in a Docker environment since the
+      # routing needs to be amended. You can point to the
+      # internal network alias.
+      RAZZLE_INTERNAL_API_PATH: http://backend:8080/agencia
+      RAZZLE_DEV_PROXY_API_PATH: http://backend:8080/agencia
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend/src/addons:/src/addons
+      
+  portal:
+    image: ghcr.io/plonegovbr/portal:latest
+    ports:
+      - '3000:3000'
+    restart: always
+    labels:
+      - traefik.enable=true
+      #service
+      - traefik.http.services.plone-portal.loadbalancer.server.port=3000
+      # HOST: main
+      - traefik.http.routers.portal.rule=Host(`portal.localhost`)
+      - traefik.http.routers.portal.service=plone-portal
+      - traefik.http.routers.portal.middlewares=gzip
+    environment:
+      # These are needed in a Docker environment since the
+      # routing needs to be amended. You can point to the
+      # internal network alias.
+      RAZZLE_INTERNAL_API_PATH: http://backend:8080/portal
+      RAZZLE_DEV_PROXY_API_PATH: http://backend:8080/portal
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend/src/addons:/src/addons
+      
+  
+  backend:
+    image: plone/plone-backend:${PLONE_VERSION:-6}
+    environment:
+      SITE: Plone
+      CORS_ALLOW_ORIGIN: '*'
+    ports:
+      - 8080:8080
+    volumes:
+      - data:/data
+volumes:
+  data:
