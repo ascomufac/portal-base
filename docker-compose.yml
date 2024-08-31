@@ -90,7 +90,7 @@ services:
       
   
   backend:
-    image: plone/plone-backend:6.0.5
+    image: plone/plone-backend:6.0.12
     environment:
       SITE: Plone
       CORS_ALLOW_ORIGIN: '*'
