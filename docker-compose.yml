@@ -107,6 +107,8 @@ services:
       - traefik.http.routers.backend.rule=Host(`www3.ufac.br`)
       - traefik.http.routers.backend.entrypoints=http,https
       - traefik.http.routers.backend.service=plone-backend
+      - traefik.http.routers.backend.tls=true
+      - traefik.http.routers.backend.tls.certresolver=myresolver
     volumes:
       - data:/data
 volumes:
