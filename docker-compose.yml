@@ -106,7 +106,7 @@ services:
       - traefik.http.services.plone-backend.loadbalancer.server.port=8080
       - traefik.http.routers.backend.rule=Host(`www3.ufac.br`)
       - traefik.http.routers.backend.entrypoints=http,https
-      - traefik.http.routers.backend.service=plone-backend
+      #- traefik.http.routers.backend.service=plone-backend
       - traefik.http.routers.backend.tls=true
       - traefik.http.routers.backend.tls.certresolver=myresolver
     volumes:
