@@ -1,45 +1,25 @@
 version: "4"
 services:
   webserver:
-    image: traefik:v2.10
-
+    image: traefik:v2.5
     ports:
       - "80:80"
       - "443:443"
-      #- "81:81"
-      #- "8888:8080"
-
-    labels:
-      traefik.enable=true
-      traefik.constraint-label=public
-      traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
-      traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
-      traefik.http.middlewares.gzip.compress=true
-      traefik.http.middlewares.gzip.compress.excludedcontenttypes=image/png, image/jpeg, font/woff2
-      traefik.http.routers.generic-https-redirect.entrypoints=http
-      traefik.http.routers.generic-https-redirect.rule=HostRegexp(`{host:.*}`)
-      traefik.http.routers.generic-https-redirect.priority=1
-      traefik.http.routers.generic-https-redirect.middlewares=https-redirect
-      traefik.http.routers.backend.middlewares:https-redirect
-
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.myresolver.acme.email=ascom@ufac.br"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./letsencrypt:/letsencrypt
-
-    command:
-      - --providers.docker
-      - --providers.docker.constraints=Label(`traefik.constraint-label`, `public`)
-      - --providers.docker.exposedbydefault=false
-      - --entrypoints.http.address=:80
-      - --entrypoints.https.address=:443
-      - --certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=http
-      - --certificatesresolvers.myresolver.acme.httpchallenge=true
-      - --certificatesresolvers.myresolver.acme.email=ascom@ufac.br
-      - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
-      - --accesslog
-      - --accesslog.format=json
-      - --log.level=DEBUG
-      - --api.insecure=true
+    networks:
+      - web
+      - internal
       
   agencia:
     image: ghcr.io/plonegovbr/portal:latest
@@ -99,13 +79,20 @@ services:
     ports:
       - 8080:8080
     labels:
-       traefik.enable=true
-       traefik.http.services.plone-backend.loadbalancer.server.port=8080
-       traefik.http.routers.backend.rule=Host(`www3.ufac.br`)
-       traefik.http.routers.backend.entrypoints=http,https
-       traefik.http.routers.backend.tls=true
-       traefik.http.routers.backend.tls.certresolver:myresolver
+      - "traefik.enable=true"
+      - "traefik.http.routers.plone-http.rule=Host(`www3.ufac.br`)"
+      - "traefik.http.routers.plone-http.entrypoints=web"
+      - "traefik.http.services.plone-backend.loadbalancer.server.port=8080"
     volumes:
       - data:/data
+    networks:
+      - internal
+
+networks:
+  web:
+    external: true
+  internal:
+    external: false
+
 volumes:
   data:
