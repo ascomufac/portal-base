@@ -2,9 +2,11 @@ version: "4"
 services:
   webserver:
     image: traefik:v2.5
+
     ports:
       - "80:80"
       - "443:443"
+
     command:
       - "--api.insecure=true"
       - "--providers.docker=true"
@@ -14,12 +16,10 @@ services:
       - "--certificatesresolvers.myresolver.acme.email=ascom@ufac.br"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
       - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./letsencrypt:/letsencrypt
-    networks:
-      - web
-      - internal
       
   agencia:
     image: ghcr.io/plonegovbr/portal:latest
@@ -85,14 +85,6 @@ services:
       - "traefik.http.services.plone-backend.loadbalancer.server.port=8080"
     volumes:
       - data:/data
-    networks:
-      - internal
-
-networks:
-  web:
-    external: true
-  internal:
-    external: false
 
 volumes:
   data:
