@@ -27,6 +27,7 @@ services:
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./letsencrypt:/letsencrypt
 
     command:
       - --providers.docker
@@ -34,6 +35,10 @@ services:
       - --providers.docker.exposedbydefault=false
       - --entrypoints.http.address=:80
       - --entrypoints.https.address=:443
+      - --certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=http
+      - --certificatesresolvers.myresolver.acme.httpchallenge=true
+      - --certificatesresolvers.myresolver.acme.email=ascom@ufac.br
+      - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
       - --accesslog
       - --accesslog.format=json
       - --log.level=DEBUG
