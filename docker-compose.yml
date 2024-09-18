@@ -14,16 +14,16 @@ services:
       - traefik.constraint-label=public
 
       # GENERIC MIDDLEWARES
-      # - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
-      # - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+      - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
+      - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
       - traefik.http.middlewares.gzip.compress=true
       - traefik.http.middlewares.gzip.compress.excludedcontenttypes=image/png, image/jpeg, font/woff2
 
       # GENERIC ROUTERS
-      # - traefik.http.routers.generic-https-redirect.entrypoints=http
-      # - traefik.http.routers.generic-https-redirect.rule=HostRegexp(`{host:.*}`)
-      # - traefik.http.routers.generic-https-redirect.priority=1
-      # - traefik.http.routers.generic-https-redirect.middlewares=https-redirect
+      - traefik.http.routers.generic-https-redirect.entrypoints=http
+      - traefik.http.routers.generic-https-redirect.rule=HostRegexp(`{host:.*}`)
+      - traefik.http.routers.generic-https-redirect.priority=1
+      - traefik.http.routers.generic-https-redirect.middlewares=https-redirect
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -105,7 +105,7 @@ services:
       - traefik.enable=true
       - traefik.http.services.plone-backend.loadbalancer.server.port=8080
       - traefik.http.routers.backend.rule=Host(`www3.ufac.br`)
-      - traefik.http.routers.backend.entrypoints=http
+      - traefik.http.routers.backend.entrypoints=http,https
       - traefik.http.routers.backend.service=plone-backend
     volumes:
       - data:/data
