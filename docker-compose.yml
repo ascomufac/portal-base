@@ -1,11 +1,13 @@
-version: "3"
+version: "4"
 services:
   webserver:
     image: traefik:v2.10
 
     ports:
-      - 81:81
-      - 8888:8080
+      - "80:80"
+      - "443:443"
+      #- "81:81"
+      #- "8888:8080"
 
     labels:
       - traefik.enable=true
@@ -31,14 +33,11 @@ services:
       - --providers.docker.constraints=Label(`traefik.constraint-label`, `public`)
       - --providers.docker.exposedbydefault=false
       - --entrypoints.http.address=:80
-      # - --entrypoints.https.address=:443
+      - --entrypoints.https.address=:443
       - --accesslog
       - --accesslog.format=json
-      - --accesslog.fields.headers.names.X-Varnish-Routed=keep
-      - --accesslog.fields.headers.names.RequestHost=keep
-      - --log
       - --log.level=DEBUG
-      - --api
+      - --api.insecure=true
       
   agencia:
     image: ghcr.io/plonegovbr/portal:latest
@@ -97,6 +96,12 @@ services:
       ADDONS: "collective.exportimport"
     ports:
       - 8080:8080
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.plone-backend.loadbalancer.server.port=8080
+      - traefik.http.routers.backend.rule=Host(`www3.ufac.br`)
+      - traefik.http.routers.backend.entrypoints=http
+      - traefik.http.routers.backend.service=plone-backend
     volumes:
       - data:/data
 volumes:
