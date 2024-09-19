@@ -5,19 +5,19 @@ services:
 
     ports:
       - "80:80"
-      - "443:443"
+      #- "443:443"
 
     command:
       - "--api.insecure=true"
       - "--providers.docker=true"
       - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--entrypoints.websecure.http.tls=true"
+      #- "--entrypoints.websecure.address=:443"
+      #- "--entrypoints.websecure.http.tls=true"
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /usr/local/plone/cert:/certs
-      - "./dynamic:/dynamic"
+      #- "./dynamic:/dynamic"
       
   agencia:
     image: ghcr.io/plonegovbr/portal:latest
@@ -102,11 +102,11 @@ services:
       - 8080:8080
     labels:
       - "traefik.http.routers.seusite.rule=Host(`www3.ufac.br`)"
-      - "traefik.http.routers.seusite.entrypoints=websecure"
-      - "traefik.http.routers.seusite.tls=true"
-      - "traefik.http.routers.seusite.tls.certresolver=myresolver"
-      - "traefik.http.middlewares.redirect-to-editais.redirectregex.regex=^https://www3.ufac.br/?$$"
-      - "traefik.http.middlewares.redirect-to-editais.redirectregex.replacement=https://www3.ufac.br/editais"
+      #- "traefik.http.routers.seusite.entrypoints=websecure"
+      #- "traefik.http.routers.seusite.tls=true"
+      #- "traefik.http.routers.seusite.tls.certresolver=myresolver"
+      - "traefik.http.middlewares.redirect-to-editais.redirectregex.regex=^http://www3.ufac.br/?$$"
+      - "traefik.http.middlewares.redirect-to-editais.redirectregex.replacement=http://www3.ufac.br/editais"
       - "traefik.http.middlewares.redirect-to-editais.redirectregex.permanent=true"
       - "traefik.http.routers.plone.middlewares=redirect-to-editais"
     volumes:
