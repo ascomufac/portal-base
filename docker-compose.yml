@@ -99,7 +99,7 @@ services:
       CORS_ALLOW_ORIGIN: '*'
       ADDONS: "collective.exportimport"
     ports:
-      - 8080:8080
+      - 80:8080
     labels:
       - "traefik.http.routers.seusite.rule=Host(`www3.ufac.br`)"
       #- "traefik.http.routers.seusite.entrypoints=websecure"
