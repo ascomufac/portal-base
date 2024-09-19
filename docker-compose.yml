@@ -17,15 +17,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /usr/local/plone/cert:/certs
-    labels:
-    - "traefik.http.routers.seusite.rule=Host(`www3.ufac.br`)"
-    - "traefik.http.routers.seusite.entrypoints=websecure"
-    - "traefik.http.routers.seusite.tls=true"
-    - "traefik.http.routers.seusite.tls.certresolver=myresolver"
-    tls:
-      certificates:
-        - certFile: "/certs/certificate.crt"
-          keyFile: "/certs/private.key"
+      - "./dynamic:/dynamic"
       
   agencia:
     image: ghcr.io/plonegovbr/portal:latest
@@ -109,10 +101,10 @@ services:
     ports:
       - 8080:8080
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.plone-http.rule=Host(`www3.ufac.br`)"
-      - "traefik.http.routers.plone-http.entrypoints=web"
-      - "traefik.http.services.plone-backend.loadbalancer.server.port=8080"
+      - "traefik.http.routers.seusite.rule=Host(`www3.ufac.br`)"
+      - "traefik.http.routers.seusite.entrypoints=websecure"
+      - "traefik.http.routers.seusite.tls=true"
+      - "traefik.http.routers.seusite.tls.certresolver=myresolver"
     volumes:
       - data:/data
 
