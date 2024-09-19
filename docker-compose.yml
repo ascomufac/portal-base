@@ -77,7 +77,7 @@ services:
       #service
       - traefik.http.services.plone-editais.loadbalancer.server.port=3000
       # HOST: main
-      - traefik.http.routers.portal.rule=Host(`portal.localhost`)
+      - traefik.http.routers.portal.rule=Host(`editais.localhost`)
       - traefik.http.routers.portal.service=plone-editais
       - traefik.http.routers.portal.middlewares=gzip
     environment:
