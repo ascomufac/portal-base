@@ -4,8 +4,8 @@ services:
     image: traefik:v2.9
 
     ports:
-      - "81:80"
-      #- "443:443"
+      - "80:80"
+      - "443:443"
 
     command:
       - "--api.insecure=true"
@@ -99,7 +99,7 @@ services:
       CORS_ALLOW_ORIGIN: '*'
       ADDONS: "collective.exportimport"
     ports:
-      - 80:8080
+      - 8080:8080
     labels:
       - "traefik.http.routers.seusite.rule=Host(`www3.ufac.br`)"
       #- "traefik.http.routers.seusite.entrypoints=websecure"
