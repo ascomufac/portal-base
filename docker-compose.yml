@@ -68,6 +68,30 @@ services:
       - backend
     volumes:
       - ./frontend/src/addons:/src/addons
+
+  editais:
+    image: ghcr.io/plonegovbr/portal:latest
+    ports:
+      - '3003:3000'
+    restart: always
+    labels:
+      - traefik.enable=true
+      #service
+      - traefik.http.services.plone-editais.loadbalancer.server.port=3000
+      # HOST: main
+      - traefik.http.routers.portal.rule=Host(`portal.localhost`)
+      - traefik.http.routers.portal.service=plone-editais
+      - traefik.http.routers.portal.middlewares=gzip
+    environment:
+      # These are needed in a Docker environment since the
+      # routing needs to be amended. You can point to the
+      # internal network alias.
+      RAZZLE_INTERNAL_API_PATH: http://backend:8080/editais
+      RAZZLE_DEV_PROXY_API_PATH: http://backend:8080/editais
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend/src/addons:/src/addons
       
   
   backend:
