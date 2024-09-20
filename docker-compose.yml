@@ -67,7 +67,7 @@ services:
       - ./frontend/src/addons:/src/addons
 
   editais:
-    image: plone/volto:latest
+    image: plone/plone-frontend:latest
     ports:
       - '3003:3000'
     restart: always
