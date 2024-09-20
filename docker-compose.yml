@@ -68,7 +68,7 @@ services:
       - ./frontend/src/addons:/src/addons
 
   editais:
-    image: ghcr.io/plonegovbr/portal:latest
+    image: plone/volto:latest
     ports:
       - '3003:3000'
     restart: always
