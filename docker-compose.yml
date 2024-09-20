@@ -4,7 +4,7 @@ services:
   webserver:
     image: traefik:v2.9
     ports:
-      - "80:80"
+      - "81:80"
       - "443:443"
     
     command:
@@ -52,7 +52,7 @@ services:
       CORS_ALLOW_ORIGIN: '*'
       ADDONS: "collective.exportimport"
     ports:
-      - 8080:8080
+      - 80:8080
     labels:
       - traefik.enable=true
       - traefik.constraint-label=public
