@@ -4,7 +4,7 @@ services:
     image: traefik:v2.9
 
     ports:
-      - "81:80"
+      - "80:80"
       - "443:443"
 
     command:
@@ -85,6 +85,9 @@ services:
       - traefik.http.routers.editais.rule=Host(`ufac.br`)
       - traefik.http.routers.editais.service=plone-editais
       - traefik.http.routers.editais.middlewares=gzip
+      - "traefik.http.routers.editais.entrypoints=websecure"
+      - "traefik.http.routers.editais.tls=true"
+      - "traefik.http.routers.editais.tls.certresolver=myresolver"
     environment:
       # These are needed in a Docker environment since the
       # routing needs to be amended. You can point to the
@@ -105,7 +108,7 @@ services:
       CORS_ALLOW_ORIGIN: '*'
       ADDONS: "collective.exportimport"
     ports:
-      - 80:8080
+      - 8080:8080
     labels:
       - traefik.enable=true
       - traefik.constraint-label=public
@@ -113,33 +116,33 @@ services:
       - traefik.http.services.svc-backend.loadbalancer.server.port=8080
       - traefik.http.middlewares.gzip.compress=true
       ## Virtual Host Monster for /++api++/
-      - "traefik.http.middlewares.mw-backend-vhm-api.replacepathregex.regex=^/\\+\\+api\\+\\+($$|/.*)"
-      - "traefik.http.middlewares.mw-backend-vhm-api.replacepathregex.replacement=/VirtualHostBase/http/universidade.localhost/Plone/++api++/VirtualHostRoot$$1"
+      #- "traefik.http.middlewares.mw-backend-vhm-api.replacepathregex.regex=^/\\+\\+api\\+\\+($$|/.*)"
+      #- "traefik.http.middlewares.mw-backend-vhm-api.replacepathregex.replacement=/VirtualHostBase/http/universidade.localhost/Plone/++api++/VirtualHostRoot$$1"
       ## Virtual Host Monster for /ClassicUI/
-      - "traefik.http.middlewares.mw-backend-vhm-ui.replacepathregex.regex=^/ClassicUI($$|/.*)"
-      - "traefik.http.middlewares.mw-backend-vhm-ui.replacepathregex.replacement=/VirtualHostBase/http/universidade.localhost/Plone/VirtualHostRoot/_vh_ClassicUI$$1"
+      #- "traefik.http.middlewares.mw-backend-vhm-ui.replacepathregex.regex=^/ClassicUI($$|/.*)"
+      #- "traefik.http.middlewares.mw-backend-vhm-ui.replacepathregex.replacement=/VirtualHostBase/http/universidade.localhost/Plone/VirtualHostRoot/_vh_ClassicUI$$1"
       # Router: Internal
       ## /++api++/
-      - traefik.http.routers.rt-backend-api-internal.rule=Host(`www3.ufac.br`) && PathPrefix(`/++api++`)
-      - traefik.http.routers.rt-backend-api-internal.entrypoints=web
-      - traefik.http.routers.rt-backend-api-internal.service=svc-backend
-      - traefik.http.routers.rt-backend-api-internal.middlewares=gzip,mw-backend-vhm-api
+      #- traefik.http.routers.rt-backend-api-internal.rule=Host(`www3.ufac.br`) && PathPrefix(`/++api++`)
+      #- traefik.http.routers.rt-backend-api-internal.entrypoints=web
+      #- traefik.http.routers.rt-backend-api-internal.service=svc-backend
+      #- traefik.http.routers.rt-backend-api-internal.middlewares=gzip,mw-backend-vhm-api
       ## /ClassicUI/
-      - traefik.http.routers.rt-backend-ui-internal.rule=Host(`www3.ufac.br`) && PathPrefix(`/ClassicUI`)
-      - traefik.http.routers.rt-backend-ui-internal.entrypoints=web
-      - traefik.http.routers.rt-backend-ui-internal.service=svc-backend
-      - traefik.http.routers.rt-backend-ui-internal.middlewares=gzip,mw-backend-vhm-ui
+      #- traefik.http.routers.rt-backend-ui-internal.rule=Host(`www3.ufac.br`) && PathPrefix(`/ClassicUI`)
+      #- traefik.http.routers.rt-backend-ui-internal.entrypoints=web
+      #- traefik.http.routers.rt-backend-ui-internal.service=svc-backend
+      #- traefik.http.routers.rt-backend-ui-internal.middlewares=gzip,mw-backend-vhm-ui
 
       - "traefik.http.routers.seusite.rule=Host(`www3.ufac.br`)"
       - "traefik.http.routers.seusite.entrypoints=websecure"
       - "traefik.http.routers.seusite.tls=true"
       - "traefik.http.routers.seusite.tls.certresolver=myresolver"
       #redirect to editais
-      - "traefik.http.middlewares.redirect-to-editais.redirectregex.regex=^http://www3.ufac.br/?$$"
-      - "traefik.http.middlewares.redirect-to-editais.redirectregex.replacement=http://www3.ufac.br/editais"
-      - "traefik.http.middlewares.redirect-to-editais.redirectregex.permanent=true"
-      - "traefik.http.routers.plone.entrypoints=websecure"
-      - "traefik.http.routers.plone.middlewares=redirect-to-editais"
+      #- "traefik.http.middlewares.redirect-to-editais.redirectregex.regex=^http://www3.ufac.br/?$$"
+      #- "traefik.http.middlewares.redirect-to-editais.redirectregex.replacement=http://www3.ufac.br/editais"
+      #- "traefik.http.middlewares.redirect-to-editais.redirectregex.permanent=true"
+      #- "traefik.http.routers.plone.entrypoints=websecure"
+      #- "traefik.http.routers.plone.middlewares=redirect-to-editais"
 
     volumes:
       - data:/data
