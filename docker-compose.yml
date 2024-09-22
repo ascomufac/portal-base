@@ -82,7 +82,7 @@ services:
       - traefik.http.services.plone-editais.loadbalancer.server.port=3003
       - traefik.http.middlewares.gzip.compress=true
       # HOST: main
-      - traefik.http.routers.editais.rule=Host(`www3.ufac.br`)
+      - traefik.http.routers.editais.rule=Host(`www3.ufac.br/editais`)
       - traefik.http.routers.editais.service=plone-editais
       - traefik.http.routers.editais.middlewares=gzip
       #- "traefik.http.routers.editais.entrypoints=websecure"
@@ -93,7 +93,7 @@ services:
       # routing needs to be amended. You can point to the
       # internal network alias.
       RAZZLE_INTERNAL_API_PATH: http://backend:8080/editais
-      RAZZLE_API_PATH: http://www3.ufac.br/editais
+      #RAZZLE_API_PATH: http://www3.ufac.br/editais
       RAZZLE_DEV_PROXY_API_PATH: http://backend:8080/editais
     depends_on:
       - backend
