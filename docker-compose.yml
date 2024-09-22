@@ -16,6 +16,12 @@ services:
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
       - "--certificatesresolvers.myresolver.acme.email=ascom@ufac.br"
       - "--certificatesresolvers.myresolver.acme.storage=/certs/acme.json"
+    
+    #labels:
+    #  - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+    #  - "traefik.http.routers.http-catchall.rule=HostRegexp(`{any:.*}`)"
+    #  - "traefik.http.routers.http-catchall.entrypoints=web"
+    #  - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -119,6 +125,8 @@ services:
       - "traefik.http.routers.seusite.entrypoints=websecure"
       - "traefik.http.routers.seusite.tls=true"
       - "traefik.http.routers.seusite.tls.certresolver=myresolver"
+      - "traefik.http.middlewares.mw-backend-vhm.replacepathregex.regex=^/editais($$|/.*)"
+      - "traefik.http.middlewares.mw-backend-vhm.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/Plone/VirtualHostRoot/_vh_editais$$1"
       #redirect to editais
       #- "traefik.http.middlewares.redirect-to-editais.redirectregex.regex=^http://www3.ufac.br/?$$"
       #- "traefik.http.middlewares.redirect-to-editais.redirectregex.replacement=http://www3.ufac.br/editais"
