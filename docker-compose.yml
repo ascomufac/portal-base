@@ -78,30 +78,30 @@ services:
       - ./frontend/src/addons:/src/addons
 
   editais:
-  image: plone/plone-frontend:latest
-  restart: always
-  labels:
-    - traefik.enable=true
-    # Configuração do serviço
-    - traefik.http.services.plone-editais.loadbalancer.server.port=3000
-    # Router para HTTPS
-    - traefik.http.routers.editais.rule=Host(`www3.ufac.br`)
-    - traefik.http.routers.editais.entrypoints=websecure
-    - traefik.http.routers.editais.tls=true
-    - traefik.http.routers.editais.tls.certresolver=myresolver
-    # Middleware para redirecionar HTTP para HTTPS
-    - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
-    # Router para HTTP que faz o redirecionamento
-    - traefik.http.routers.editais-http.rule=Host(`www3.ufac.br`)
-    - traefik.http.routers.editais-http.entrypoints=web
-    - traefik.http.routers.editais-http.middlewares=redirect-to-https
-  environment:
-    RAZZLE_INTERNAL_API_PATH: http://backend:8080/editais
-    RAZZLE_DEV_PROXY_API_PATH: http://backend:8080/editais
-  depends_on:
-    - backend
-  volumes:
-    - ./frontend/src/addons:/src/addons
+    image: plone/plone-frontend:latest
+    restart: always
+    labels:
+      - traefik.enable=true
+      # Configuração do serviço
+      - traefik.http.services.plone-editais.loadbalancer.server.port=3000
+      # Router para HTTPS
+      - traefik.http.routers.editais.rule=Host(`www3.ufac.br`)
+      - traefik.http.routers.editais.entrypoints=websecure
+      - traefik.http.routers.editais.tls=true
+      - traefik.http.routers.editais.tls.certresolver=myresolver
+      # Middleware para redirecionar HTTP para HTTPS
+      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+      # Router para HTTP que faz o redirecionamento
+      - traefik.http.routers.editais-http.rule=Host(`www3.ufac.br`)
+      - traefik.http.routers.editais-http.entrypoints=web
+      - traefik.http.routers.editais-http.middlewares=redirect-to-https
+    environment:
+      RAZZLE_INTERNAL_API_PATH: http://backend:8080/editais
+      RAZZLE_DEV_PROXY_API_PATH: http://backend:8080/editais
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend/src/addons:/src/addons
   
   backend:
     image: plone/plone-backend:6.0.12
