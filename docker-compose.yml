@@ -92,9 +92,9 @@ services:
       # These are needed in a Docker environment since the
       # routing needs to be amended. You can point to the
       # internal network alias.
-      RAZZLE_INTERNAL_API_PATH: https://backend:8080/editais
-      RAZZLE_API_PATH: https://www3.ufac.br/editais
-      RAZZLE_DEV_PROXY_API_PATH: https://backend:8080/editais
+      RAZZLE_INTERNAL_API_PATH: http://backend:8080/editais
+      RAZZLE_API_PATH: http://www3.ufac.br/editais
+      RAZZLE_DEV_PROXY_API_PATH: http://backend:8080/editais
     depends_on:
       - backend
     volumes:
