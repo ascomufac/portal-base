@@ -82,12 +82,12 @@ services:
       - traefik.http.services.plone-editais.loadbalancer.server.port=3003
       - traefik.http.middlewares.gzip.compress=true
       # HOST: main
-      - traefik.http.routers.editais.rule=Host(`ufac.br`)
+      - traefik.http.routers.editais.rule=Host(`www3.ufac.br`)
       - traefik.http.routers.editais.service=plone-editais
       - traefik.http.routers.editais.middlewares=gzip
-      - "traefik.http.routers.editais.entrypoints=websecure"
-      - "traefik.http.routers.editais.tls=true"
-      - "traefik.http.routers.editais.tls.certresolver=myresolver"
+      #- "traefik.http.routers.editais.entrypoints=websecure"
+      #- "traefik.http.routers.editais.tls=true"
+      #- "traefik.http.routers.editais.tls.certresolver=myresolver"
     environment:
       # These are needed in a Docker environment since the
       # routing needs to be amended. You can point to the
