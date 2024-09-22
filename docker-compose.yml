@@ -13,6 +13,9 @@ services:
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
       - "--entrypoints.websecure.http.tls=true"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=ascom@ufac.br"
+      - "--certificatesresolvers.myresolver.acme.storage=/certs/acme.json"
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -27,6 +30,7 @@ services:
       - traefik.enable=true
       #service
       - traefik.http.services.plone-agencia.loadbalancer.server.port=3002
+      - traefik.http.middlewares.gzip.compress=true
       # HOST: main
       - traefik.http.routers.agencia.rule=Host(`agencia.localhost`)
       - traefik.http.routers.agencia.service=plone-agencia
@@ -51,6 +55,7 @@ services:
       - traefik.enable=true
       #service
       - traefik.http.services.plone-portal.loadbalancer.server.port=3001
+      - traefik.http.middlewares.gzip.compress=true
       # HOST: main
       - traefik.http.routers.portal.rule=Host(`portal.localhost`)
       - traefik.http.routers.portal.service=plone-portal
@@ -75,10 +80,11 @@ services:
       - traefik.enable=true
       #service
       - traefik.http.services.plone-editais.loadbalancer.server.port=3003
+      - traefik.http.middlewares.gzip.compress=true
       # HOST: main
-      - traefik.http.routers.portal.rule=Host(`ufac.br`)
-      - traefik.http.routers.portal.service=plone-editais
-      - traefik.http.routers.portal.middlewares=gzip
+      - traefik.http.routers.editais.rule=Host(`ufac.br`)
+      - traefik.http.routers.editais.service=plone-editais
+      - traefik.http.routers.editais.middlewares=gzip
     environment:
       # These are needed in a Docker environment since the
       # routing needs to be amended. You can point to the
@@ -105,6 +111,7 @@ services:
       - traefik.constraint-label=public
       # Service
       - traefik.http.services.svc-backend.loadbalancer.server.port=8080
+      - traefik.http.middlewares.gzip.compress=true
       ## Virtual Host Monster for /++api++/
       - "traefik.http.middlewares.mw-backend-vhm-api.replacepathregex.regex=^/\\+\\+api\\+\\+($$|/.*)"
       - "traefik.http.middlewares.mw-backend-vhm-api.replacepathregex.replacement=/VirtualHostBase/http/universidade.localhost/Plone/++api++/VirtualHostRoot$$1"
@@ -114,12 +121,12 @@ services:
       # Router: Internal
       ## /++api++/
       - traefik.http.routers.rt-backend-api-internal.rule=Host(`www3.ufac.br`) && PathPrefix(`/++api++`)
-      - traefik.http.routers.rt-backend-api-internal.entrypoints=http
+      - traefik.http.routers.rt-backend-api-internal.entrypoints=web
       - traefik.http.routers.rt-backend-api-internal.service=svc-backend
       - traefik.http.routers.rt-backend-api-internal.middlewares=gzip,mw-backend-vhm-api
       ## /ClassicUI/
       - traefik.http.routers.rt-backend-ui-internal.rule=Host(`www3.ufac.br`) && PathPrefix(`/ClassicUI`)
-      - traefik.http.routers.rt-backend-ui-internal.entrypoints=http
+      - traefik.http.routers.rt-backend-ui-internal.entrypoints=web
       - traefik.http.routers.rt-backend-ui-internal.service=svc-backend
       - traefik.http.routers.rt-backend-ui-internal.middlewares=gzip,mw-backend-vhm-ui
 
@@ -131,7 +138,9 @@ services:
       - "traefik.http.middlewares.redirect-to-editais.redirectregex.regex=^http://www3.ufac.br/?$$"
       - "traefik.http.middlewares.redirect-to-editais.redirectregex.replacement=http://www3.ufac.br/editais"
       - "traefik.http.middlewares.redirect-to-editais.redirectregex.permanent=true"
+      - "traefik.http.routers.plone.entrypoints=websecure"
       - "traefik.http.routers.plone.middlewares=redirect-to-editais"
+
     volumes:
       - data:/data
 
