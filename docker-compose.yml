@@ -92,9 +92,9 @@ services:
       # These are needed in a Docker environment since the
       # routing needs to be amended. You can point to the
       # internal network alias.
-      RAZZLE_INTERNAL_API_PATH: http://backend:8080/editais
-      RAZZLE_API_PATH: http://www3.ufac.br/editais
-      RAZZLE_DEV_PROXY_API_PATH: http://backend:8080/editais
+      RAZZLE_INTERNAL_API_PATH: https://backend:8080/editais
+      RAZZLE_API_PATH: https://www3.ufac.br/editais
+      RAZZLE_DEV_PROXY_API_PATH: https://backend:8080/editais
     depends_on:
       - backend
     volumes:
@@ -104,7 +104,7 @@ services:
   backend:
     image: plone/plone-backend:6.0.12
     environment:
-      SITE: Plone
+    #  SITE: Plone
       CORS_ALLOW_ORIGIN: '*'
       ADDONS: "collective.exportimport"
     ports:
@@ -115,24 +115,6 @@ services:
       # Service
       - traefik.http.services.svc-backend.loadbalancer.server.port=8080
       - traefik.http.middlewares.gzip.compress=true
-      ## Virtual Host Monster for /++api++/
-      #- "traefik.http.middlewares.mw-backend-vhm-api.replacepathregex.regex=^/\\+\\+api\\+\\+($$|/.*)"
-      #- "traefik.http.middlewares.mw-backend-vhm-api.replacepathregex.replacement=/VirtualHostBase/http/universidade.localhost/Plone/++api++/VirtualHostRoot$$1"
-      ## Virtual Host Monster for /ClassicUI/
-      #- "traefik.http.middlewares.mw-backend-vhm-ui.replacepathregex.regex=^/ClassicUI($$|/.*)"
-      #- "traefik.http.middlewares.mw-backend-vhm-ui.replacepathregex.replacement=/VirtualHostBase/http/universidade.localhost/Plone/VirtualHostRoot/_vh_ClassicUI$$1"
-      # Router: Internal
-      ## /++api++/
-      #- traefik.http.routers.rt-backend-api-internal.rule=Host(`www3.ufac.br`) && PathPrefix(`/++api++`)
-      #- traefik.http.routers.rt-backend-api-internal.entrypoints=web
-      #- traefik.http.routers.rt-backend-api-internal.service=svc-backend
-      #- traefik.http.routers.rt-backend-api-internal.middlewares=gzip,mw-backend-vhm-api
-      ## /ClassicUI/
-      #- traefik.http.routers.rt-backend-ui-internal.rule=Host(`www3.ufac.br`) && PathPrefix(`/ClassicUI`)
-      #- traefik.http.routers.rt-backend-ui-internal.entrypoints=web
-      #- traefik.http.routers.rt-backend-ui-internal.service=svc-backend
-      #- traefik.http.routers.rt-backend-ui-internal.middlewares=gzip,mw-backend-vhm-ui
-
       - "traefik.http.routers.seusite.rule=Host(`www3.ufac.br`)"
       - "traefik.http.routers.seusite.entrypoints=websecure"
       - "traefik.http.routers.seusite.tls=true"
