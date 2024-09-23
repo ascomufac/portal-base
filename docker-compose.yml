@@ -86,7 +86,7 @@ services:
     environment:
     #  SITE: Plone
       CORS_ALLOW_ORIGIN: '*'
-      ADDONS: "collective.exportimport"
+    #  ADDONS: "collective.exportimport"
     ports:
       - 8080:8080
     labels:
@@ -101,7 +101,7 @@ services:
       - "traefik.http.routers.backend.tls.certresolver=myresolver"
       # Virtual Host Monster configuration
       - "traefik.http.middlewares.vhm.replacepathregex.regex=^/(.*)"
-      - "traefik.http.middlewares.vhm.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/Plone/VirtualHostRoot/$$1"
+      - "traefik.http.middlewares.vhm.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/editais/VirtualHostRoot/$$1"
       - "traefik.http.routers.backend.middlewares=vhm"
     volumes:
       - data:/data
