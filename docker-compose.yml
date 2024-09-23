@@ -77,9 +77,9 @@ services:
       - traefik.enable=true
       - traefik.http.services.plone-editais.loadbalancer.server.port=3003
       - traefik.http.middlewares.gzip.compress=true
-      #- traefik.http.routers.editais.rule=Host(`www3.ufac.br`) && PathPrefix(`/editais`)
-      #- traefik.http.routers.editais.service=plone-editais
-      #- traefik.http.routers.editais.middlewares=gzip
+      - traefik.http.routers.editais.rule=Host(`www3.ufac.br`) && PathPrefix(`/editais`)
+      - traefik.http.routers.editais.service=plone-editais
+      - traefik.http.routers.editais.middlewares=gzip
     environment:
       RAZZLE_INTERNAL_API_PATH: http://backend:8080/editais
       RAZZLE_DEV_PROXY_API_PATH: http://backend:8080/editais
@@ -102,34 +102,16 @@ services:
       # Service
       - traefik.http.services.svc-backend.loadbalancer.server.port=8080
       - traefik.http.middlewares.gzip.compress=true
-      #- "traefik.http.routers.backend.rule=Host(`www3.ufac.br`)"
-      #- "traefik.http.routers.backend.entrypoints=websecure"
-      #- "traefik.http.routers.backend.tls=true"
-      #- "traefik.http.routers.backend.tls.certresolver=myresolver"
-      # Virtual Host Monster configuration
-      #- "traefik.http.middlewares.vhm-portal.replacepathregex.regex=^/(.*)"
-      #- "traefik.http.middlewares.vhm-portal.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/portal/VirtualHostRoot/$$1"
-      #- "traefik.http.middlewares.vhm-editais.replacepathregex.regex=^/editais(.*)"
-      #- "traefik.http.middlewares.vhm-editais.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/editais/VirtualHostRoot/$$1"
-      #- "traefik.http.routers.backend.middlewares=vhm-portal"
-      #- "traefik.http.routers.editais.middlewares=vhm-editais"
-
-      # Backend geral (portal)
-      - "traefik.http.routers.backend.rule=Host(`www3.ufac.br`) && PathPrefix(`/portal`)"
+      - "traefik.http.routers.backend.rule=Host(`www3.ufac.br`)"
       - "traefik.http.routers.backend.entrypoints=websecure"
       - "traefik.http.routers.backend.tls=true"
       - "traefik.http.routers.backend.tls.certresolver=myresolver"
+      # Virtual Host Monster configuration
       - "traefik.http.middlewares.vhm-portal.replacepathregex.regex=^/(.*)"
       - "traefik.http.middlewares.vhm-portal.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/portal/VirtualHostRoot/$$1"
-      - "traefik.http.routers.backend.middlewares=vhm-portal"
-
-      # Rota específica para /editais
-      - "traefik.http.routers.editais.rule=Host(`www3.ufac.br`) && PathPrefix(`/editais`)"
-      - "traefik.http.routers.editais.entrypoints=websecure"
-      - "traefik.http.routers.editais.tls=true"
-      - "traefik.http.routers.editais.tls.certresolver=myresolver"
       - "traefik.http.middlewares.vhm-editais.replacepathregex.regex=^/editais(.*)"
       - "traefik.http.middlewares.vhm-editais.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/editais/VirtualHostRoot/$$1"
+      - "traefik.http.routers.backend.middlewares=vhm-portal"
       - "traefik.http.routers.editais.middlewares=vhm-editais"
      
     volumes:
