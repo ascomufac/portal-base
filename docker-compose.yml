@@ -59,6 +59,10 @@ services:
       - traefik.http.routers.portal.rule=Host(`portal.localhost`)
       - traefik.http.routers.portal.service=plone-portal
       - traefik.http.routers.portal.middlewares=gzip
+      - "traefik.http.middlewares.redirect-to-portal.redirectregex.regex=^https://www3.ufac.br/?$$"
+      - "traefik.http.middlewares.redirect-to-portal.redirectregex.replacement=https://www3.ufac.br/portal"
+      - "traefik.http.middlewares.redirect-to-portal.redirectregex.permanent=true"
+      - "traefik.http.routers.portal.middlewares=redirect-to-portal"
     environment:
       RAZZLE_INTERNAL_API_PATH: http://backend:8080/portal
       RAZZLE_DEV_PROXY_API_PATH: http://backend:8080/portal
@@ -79,6 +83,10 @@ services:
       - traefik.http.routers.editais.rule=Host(`editais.localhost`)
       - traefik.http.routers.editais.service=plone-editais
       - traefik.http.routers.editais.middlewares=gzip
+      - "traefik.http.middlewares.redirect-to-editais.redirectregex.regex=^https://www3.ufac.br/editais?$$"
+      - "traefik.http.middlewares.redirect-to-editais.redirectregex.replacement=https://www3.ufac.br/editais"
+      - "traefik.http.middlewares.redirect-to-editais.redirectregex.permanent=true"
+      - "traefik.http.routers.editais.middlewares=redirect-to-editais"
     environment:
       RAZZLE_INTERNAL_API_PATH: http://backend:8080/editais
       RAZZLE_DEV_PROXY_API_PATH: http://backend:8080/editais
@@ -106,9 +114,10 @@ services:
       - "traefik.http.routers.backend.tls=true"
       - "traefik.http.routers.backend.tls.certresolver=myresolver"
       # Virtual Host Monster configuration
-      - "traefik.http.middlewares.vhm.replacepathregex.regex=^/(.*)"
-      - "traefik.http.middlewares.vhm.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/editais/VirtualHostRoot/$$1"
-      - "traefik.http.routers.backend.middlewares=vhm"
+      #- "traefik.http.middlewares.vhm.replacepathregex.regex=^/(.*)"
+      #- "traefik.http.middlewares.vhm.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/editais/VirtualHostRoot/$$1"
+      #- "traefik.http.routers.backend.middlewares=vhm"
+
     volumes:
       - data:/data
 
