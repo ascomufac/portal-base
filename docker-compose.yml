@@ -6,7 +6,6 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      - "3003:3003"
 
     command:
       - "--api.insecure=true"
@@ -62,9 +61,6 @@ services:
       - traefik.http.routers.portal.service=plone-portal
       - traefik.http.routers.portal.middlewares=gzip
     environment:
-      # These are needed in a Docker environment since the
-      # routing needs to be amended. You can point to the
-      # internal network alias.
       RAZZLE_INTERNAL_API_PATH: http://backend:8080/portal
       RAZZLE_DEV_PROXY_API_PATH: http://backend:8080/portal
     depends_on:
@@ -74,24 +70,16 @@ services:
 
   editais:
     image: plone/plone-frontend:latest
-    #ports:
-    #  - '3003:3000'
+    ports:
+      - '3003:3000'
     restart: always
     labels:
       - traefik.enable=true
       # Configuração do serviço
       - traefik.http.services.plone-editais.loadbalancer.server.port=3003
-      # Router para HTTPS
-      - traefik.http.routers.editais.rule=Host(`www3.ufac.br`)
-      - traefik.http.routers.editais.entrypoints=websecure
-      - traefik.http.routers.editais.tls=true
-      - traefik.http.routers.editais.tls.certresolver=myresolver
-      # Middleware para redirecionar HTTP para HTTPS
-      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
       # Router para HTTP que faz o redirecionamento
-      - traefik.http.routers.editais-http.rule=Host(`www3.ufac.br`)
-      - traefik.http.routers.editais-http.entrypoints=web
-      - traefik.http.routers.editais-http.middlewares=redirect-to-https
+      - traefik.http.routers.editais.rule=Host(`editais.localhost`)
+      - traefik.http.routers.editais.service=plone-editais
     environment:
       RAZZLE_INTERNAL_API_PATH: http://backend:8080/editais
       RAZZLE_DEV_PROXY_API_PATH: http://backend:8080/editais
@@ -118,15 +106,6 @@ services:
       - "traefik.http.routers.seusite.entrypoints=websecure"
       - "traefik.http.routers.seusite.tls=true"
       - "traefik.http.routers.seusite.tls.certresolver=myresolver"
-      - "traefik.http.middlewares.mw-backend-vhm.replacepathregex.regex=^/editais($$|/.*)"
-      - "traefik.http.middlewares.mw-backend-vhm.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/Plone/VirtualHostRoot/_vh_editais$$1"
-      #redirect to editais
-      #- "traefik.http.middlewares.redirect-to-editais.redirectregex.regex=^http://www3.ufac.br/?$$"
-      #- "traefik.http.middlewares.redirect-to-editais.redirectregex.replacement=http://www3.ufac.br/editais"
-      #- "traefik.http.middlewares.redirect-to-editais.redirectregex.permanent=true"
-      #- "traefik.http.routers.plone.entrypoints=websecure"
-      #- "traefik.http.routers.plone.middlewares=redirect-to-editais"
-
     volumes:
       - data:/data
 
