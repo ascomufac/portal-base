@@ -115,7 +115,7 @@ services:
       - "traefik.http.routers.backend.middlewares=vhm-portal"
       #- "traefik.http.routers.editais.middlewares=vhm-editais"
       # Middleware para redirecionamento
-      - "traefik.http.middlewares.redirect-editais.redirectscheme.scheme=http"
+      - "traefik.http.middlewares.redirect-editais.redirectscheme.scheme=https"
       - "traefik.http.middlewares.redirect-editais.redirectscheme.port=3003"
      
     volumes:
