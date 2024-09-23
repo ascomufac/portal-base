@@ -1,12 +1,10 @@
-version: "4"
+version: "4.1"
 services:
   webserver:
     image: traefik:v2.9
-
     ports:
       - "80:80"
       - "443:443"
-
     command:
       - "--api.insecure=true"
       - "--providers.docker=true"
@@ -17,16 +15,15 @@ services:
       - "--certificatesresolvers.myresolver.acme.email=ascom@ufac.br"
       - "--certificatesresolvers.myresolver.acme.storage=/certs/acme.json"
     labels:
-    # Redirecionar HTTP para HTTPS
-    - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-    - "traefik.http.routers.http-catchall.rule=Host(`www3.ufac.br`)"
-    - "traefik.http.routers.http-catchall.entrypoints=web"
-    - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
-
+      # Redirecionar HTTP para HTTPS
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.http-catchall.rule=Host(`www3.ufac.br`)"
+      - "traefik.http.routers.http-catchall.entrypoints=web"
+      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /usr/local/plone/cert:/certs
-      
+
   agencia:
     image: ghcr.io/plonegovbr/portal:latest
     ports:
@@ -36,17 +33,10 @@ services:
       - traefik.enable=true
       - traefik.http.services.plone-agencia.loadbalancer.server.port=3002
       - traefik.http.middlewares.gzip.compress=true
-      - traefik.http.routers.agencia.rule=Host(`agencia.localhost`)
+      - traefik.http.routers.agencia.rule=Host(`agencia.localhost`)"
       - traefik.http.routers.agencia.service=plone-agencia
       - traefik.http.routers.agencia.middlewares=gzip
-    environment:
-      RAZZLE_INTERNAL_API_PATH: http://backend:8080/agencia
-      RAZZLE_DEV_PROXY_API_PATH: http://backend:8080/agencia
-    depends_on:
-      - backend
-    volumes:
-      - ./frontend/src/addons:/src/addons
-      
+
   portal:
     image: ghcr.io/plonegovbr/portal:latest
     ports:
@@ -56,17 +46,9 @@ services:
       - traefik.enable=true
       - traefik.http.services.plone-portal.loadbalancer.server.port=3001
       - traefik.http.middlewares.gzip.compress=true
-      - traefik.http.routers.portal.rule=Host(`portal.localhost`)
+      - traefik.http.routers.portal.rule=Host(`portal.localhost`)"
       - traefik.http.routers.portal.service=plone-portal
       - traefik.http.routers.portal.middlewares=gzip
-      
-    environment:
-      RAZZLE_INTERNAL_API_PATH: http://backend:8080/portal
-      RAZZLE_DEV_PROXY_API_PATH: http://backend:8080/portal
-    depends_on:
-      - backend
-    volumes:
-      - ./frontend/src/addons:/src/addons
 
   editais:
     image: plone/plone-frontend:latest
@@ -77,45 +59,39 @@ services:
       - traefik.enable=true
       - traefik.http.services.plone-editais.loadbalancer.server.port=3003
       - traefik.http.middlewares.gzip.compress=true
-      - traefik.http.routers.editais.rule=Host(`www3.ufac.br`) && PathPrefix(`/editais`)
-      - traefik.http.routers.editais.service=plone-editais
-      - traefik.http.routers.editais.middlewares=gzip
-    environment:
-      RAZZLE_INTERNAL_API_PATH: http://backend:8080/editais
-      RAZZLE_DEV_PROXY_API_PATH: http://backend:8080/editais
-    depends_on:
-      - backend
-    volumes:
-      - ./frontend/src/addons:/src/addons
-  
+      # Ajustando o nome do router para ser único
+      - traefik.http.routers.editais-front.rule=Host(`www3.ufac.br`) && PathPrefix(`/editais`)"
+      - traefik.http.routers.editais-front.service=plone-editais
+      - traefik.http.routers.editais-front.middlewares=gzip
+
   backend:
     image: plone/plone-backend:6.0.12
     environment:
-    #  SITE: Plone
       CORS_ALLOW_ORIGIN: '*'
-    #  ADDONS: "collective.exportimport"
+      #  ADDONS: "collective.exportimport"
     ports:
       - 8080:8080
     labels:
       - traefik.enable=true
       - traefik.constraint-label=public
-      # Service
+      # Ajustando o nome do router para ser único
       - traefik.http.services.svc-backend.loadbalancer.server.port=8080
       - traefik.http.middlewares.gzip.compress=true
-      - "traefik.http.routers.backend.rule=Host(`www3.ufac.br`)"
-      - "traefik.http.routers.backend.entrypoints=websecure"
-      - "traefik.http.routers.backend.tls=true"
-      - "traefik.http.routers.backend.tls.certresolver=myresolver"
-      # Virtual Host Monster configuration
-      #- "traefik.http.middlewares.vhm-portal.replacepathregex.regex=^/(.*)"
-      #- "traefik.http.middlewares.vhm-portal.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/portal/VirtualHostRoot/$$1"
+      - "traefik.http.routers.backend-portal.rule=Host(`www3.ufac.br`) && PathPrefix(`/portal`)"
+      - "traefik.http.routers.backend-portal.entrypoints=websecure"
+      - "traefik.http.routers.backend-portal.tls=true"
+      - "traefik.http.routers.backend-portal.tls.certresolver=myresolver"
+      - "traefik.http.middlewares.vhm-portal.replacepathregex.regex=^/(.*)"
+      - "traefik.http.middlewares.vhm-portal.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/portal/VirtualHostRoot/$$1"
+      - "traefik.http.routers.backend-portal.middlewares=vhm-portal"
+      # Ajustando o router do serviço editais no backend
+      - "traefik.http.routers.backend-editais.rule=Host(`www3.ufac.br`) && PathPrefix(`/editais`)"
+      - "traefik.http.routers.backend-editais.middlewares=vhm-editais"
       - "traefik.http.middlewares.vhm-editais.replacepathregex.regex=^/editais(.*)"
       - "traefik.http.middlewares.vhm-editais.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/editais/VirtualHostRoot/$$1"
-      #- "traefik.http.routers.backend.middlewares=vhm-portal"
-      - "traefik.http.routers.editais.middlewares=vhm-editais"
-     
-    volumes:
-      - data:/data
 
 volumes:
   data:
+
+
+
