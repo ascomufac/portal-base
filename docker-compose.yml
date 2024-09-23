@@ -77,8 +77,7 @@ services:
       - traefik.enable=true
       - traefik.http.services.plone-editais.loadbalancer.server.port=3003
       - traefik.http.middlewares.gzip.compress=true
-      #- traefik.http.routers.editais.rule=Host(`editais.localhost`)
-      - traefik.http.routers.editais.rule=Host(`www3.ufac.br`) && PathPrefix(`/editais`)
+      #- traefik.http.routers.editais.rule=Host(`www3.ufac.br`) && PathPrefix(`/editais`)
       - traefik.http.routers.editais.service=plone-editais
       - traefik.http.routers.editais.middlewares=gzip
     environment:
@@ -113,10 +112,7 @@ services:
       - "traefik.http.middlewares.vhm-editais.replacepathregex.regex=^/editais(.*)"
       - "traefik.http.middlewares.vhm-editais.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/editais/VirtualHostRoot/$$1"
       - "traefik.http.routers.backend.middlewares=vhm-portal"
-      #- "traefik.http.routers.editais.middlewares=vhm-editais"
-      # Middleware para redirecionamento
-      - "traefik.http.middlewares.redirect-editais.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.redirect-editais.redirectscheme.port=3003"
+      - "traefik.http.routers.editais.middlewares=vhm-editais"
      
     volumes:
       - data:/data
