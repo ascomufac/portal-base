@@ -113,7 +113,12 @@ services:
       - "traefik.http.middlewares.vhm-editais.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/editais/VirtualHostRoot/$$1"
       - "traefik.http.routers.backend.middlewares=vhm-portal"
       - "traefik.http.routers.editais.middlewares=vhm-editais"
-
+      # Middleware para redirecionamento
+      - "traefik.http.middlewares.redirect-editais.redirectscheme.scheme=http"
+      - "traefik.http.middlewares.redirect-editais.redirectscheme.port=3003"
+      - "traefik.http.routers.editais.rule=Host(`www3.ufac.br`) && PathPrefix(`/editais`)"
+      - "traefik.http.routers.editais.middlewares=redirect-editais"
+     
     volumes:
       - data:/data
 
