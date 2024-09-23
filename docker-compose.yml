@@ -6,6 +6,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
+      - "3003:3003"
 
     command:
       - "--api.insecure=true"
@@ -16,12 +17,6 @@ services:
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
       - "--certificatesresolvers.myresolver.acme.email=ascom@ufac.br"
       - "--certificatesresolvers.myresolver.acme.storage=/certs/acme.json"
-    
-    labels:
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-      - "traefik.http.routers.http-catchall.rule=HostRegexp(`{any:.*}`)"
-      - "traefik.http.routers.http-catchall.entrypoints=web"
-      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -79,8 +74,8 @@ services:
 
   editais:
     image: plone/plone-frontend:latest
-    ports:
-      - '3003:3000'
+    #ports:
+    #  - '3003:3000'
     restart: always
     labels:
       - traefik.enable=true
@@ -92,11 +87,11 @@ services:
       - traefik.http.routers.editais.tls=true
       - traefik.http.routers.editais.tls.certresolver=myresolver
       # Middleware para redirecionar HTTP para HTTPS
-      #- traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
       # Router para HTTP que faz o redirecionamento
-      #- traefik.http.routers.editais-http.rule=Host(`www3.ufac.br`)
-      #- traefik.http.routers.editais-http.entrypoints=web
-      #- traefik.http.routers.editais-http.middlewares=redirect-to-https
+      - traefik.http.routers.editais-http.rule=Host(`www3.ufac.br`)
+      - traefik.http.routers.editais-http.entrypoints=web
+      - traefik.http.routers.editais-http.middlewares=redirect-to-https
     environment:
       RAZZLE_INTERNAL_API_PATH: http://backend:8080/editais
       RAZZLE_DEV_PROXY_API_PATH: http://backend:8080/editais
