@@ -78,8 +78,10 @@ services:
       - traefik.http.services.plone-editais.loadbalancer.server.port=3003
       - traefik.http.middlewares.gzip.compress=true
       - traefik.http.routers.editais.rule=Host(`editais.localhost`)
+      - traefik.http.routers.editais.rule=Host(`www3.ufac.br`) && PathPrefix(`/editais`)
       - traefik.http.routers.editais.service=plone-editais
       - traefik.http.routers.editais.middlewares=gzip
+      - traefik.http.routers.editais.middlewares=redirect-editais
     environment:
       RAZZLE_INTERNAL_API_PATH: http://backend:8080/editais
       RAZZLE_DEV_PROXY_API_PATH: http://backend:8080/editais
@@ -116,8 +118,6 @@ services:
       # Middleware para redirecionamento
       - "traefik.http.middlewares.redirect-editais.redirectscheme.scheme=http"
       - "traefik.http.middlewares.redirect-editais.redirectscheme.port=3003"
-      - "traefik.http.routers.editais.rule=Host(`www3.ufac.br`) && PathPrefix(`/editais`)"
-      - "traefik.http.routers.editais.middlewares=redirect-editais"
      
     volumes:
       - data:/data
