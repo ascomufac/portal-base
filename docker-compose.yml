@@ -99,21 +99,17 @@ services:
     labels:
       - traefik.enable=true
       - traefik.constraint-label=public
-      # Service
+      # Ajustando o nome do router para ser único
       - traefik.http.services.svc-backend.loadbalancer.server.port=8080
       - traefik.http.middlewares.gzip.compress=true
-      - "traefik.http.routers.backend-portal.rule=Host(`www3.ufac.br`)"
+      - "traefik.http.routers.backend-portal.rule=Host(`www3.ufac.br`) && PathPrefix(`/portal`)"
       - "traefik.http.routers.backend-portal.entrypoints=websecure"
       - "traefik.http.routers.backend-portal.tls=true"
       - "traefik.http.routers.backend-portal.tls.certresolver=myresolver"
-      # Virtual Host Monster configuration
       - "traefik.http.middlewares.vhm-portal.replacepathregex.regex=^/(.*)"
       - "traefik.http.middlewares.vhm-portal.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/portal/VirtualHostRoot/$$1"
-      #- "traefik.http.middlewares.vhm-editais.replacepathregex.regex=^/editais(.*)"
-      #- "traefik.http.middlewares.vhm-editais.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/editais/VirtualHostRoot/$$1"
       - "traefik.http.routers.backend-portal.middlewares=vhm-portal"
-      #- "traefik.http.routers.backend-editais.middlewares=vhm-editais"
-
+      # Ajustando o router do serviço editais no backend
       - "traefik.http.routers.backend-editais.rule=Host(`www3.ufac.br`) && PathPrefix(`/editais`)"
       - "traefik.http.routers.backend-editais.middlewares=vhm-editais"
       - "traefik.http.middlewares.vhm-editais.replacepathregex.regex=^/editais(.*)"
