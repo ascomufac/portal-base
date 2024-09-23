@@ -28,17 +28,12 @@ services:
     restart: always
     labels:
       - traefik.enable=true
-      #service
       - traefik.http.services.plone-agencia.loadbalancer.server.port=3002
       - traefik.http.middlewares.gzip.compress=true
-      # HOST: main
       - traefik.http.routers.agencia.rule=Host(`agencia.localhost`)
       - traefik.http.routers.agencia.service=plone-agencia
       - traefik.http.routers.agencia.middlewares=gzip
     environment:
-      # These are needed in a Docker environment since the
-      # routing needs to be amended. You can point to the
-      # internal network alias.
       RAZZLE_INTERNAL_API_PATH: http://backend:8080/agencia
       RAZZLE_DEV_PROXY_API_PATH: http://backend:8080/agencia
     depends_on:
@@ -53,10 +48,8 @@ services:
     restart: always
     labels:
       - traefik.enable=true
-      #service
       - traefik.http.services.plone-portal.loadbalancer.server.port=3001
       - traefik.http.middlewares.gzip.compress=true
-      # HOST: main
       - traefik.http.routers.portal.rule=Host(`portal.localhost`)
       - traefik.http.routers.portal.service=plone-portal
       - traefik.http.routers.portal.middlewares=gzip
@@ -75,11 +68,11 @@ services:
     restart: always
     labels:
       - traefik.enable=true
-      # Configuração do serviço
       - traefik.http.services.plone-editais.loadbalancer.server.port=3003
-      # Router para HTTP que faz o redirecionamento
+      - traefik.http.middlewares.gzip.compress=true
       - traefik.http.routers.editais.rule=Host(`editais.localhost`)
       - traefik.http.routers.editais.service=plone-editais
+      - traefik.http.routers.editais.middlewares=gzip
     environment:
       RAZZLE_INTERNAL_API_PATH: http://backend:8080/editais
       RAZZLE_DEV_PROXY_API_PATH: http://backend:8080/editais
@@ -102,10 +95,10 @@ services:
       # Service
       - traefik.http.services.svc-backend.loadbalancer.server.port=8080
       - traefik.http.middlewares.gzip.compress=true
-      - "traefik.http.routers.seusite.rule=Host(`www3.ufac.br`)"
-      - "traefik.http.routers.seusite.entrypoints=websecure"
-      - "traefik.http.routers.seusite.tls=true"
-      - "traefik.http.routers.seusite.tls.certresolver=myresolver"
+      - "traefik.http.routers.backend.rule=Host(`www3.ufac.br`)"
+      - "traefik.http.routers.backend.entrypoints=websecure"
+      - "traefik.http.routers.backend.tls=true"
+      - "traefik.http.routers.backend.tls.certresolver=myresolver"
     volumes:
       - data:/data
 
