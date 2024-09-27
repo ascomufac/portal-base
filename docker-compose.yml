@@ -93,7 +93,7 @@ services:
     environment:
     #  SITE: Plone
       CORS_ALLOW_ORIGIN: '*'
-    #  ADDONS: "collective.exportimport"
+      ADDONS: "collective.exportimport"
     ports:
       - 8080:8080
     labels:
