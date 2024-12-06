@@ -92,6 +92,7 @@ services:
     #  SITE: Plone
       CORS_ALLOW_ORIGIN: '*'
       ADDONS: "collective.exportimport"
+      TZ: America/Rio_Branco
     ports:
       - 8080:8080
     labels:
