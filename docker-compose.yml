@@ -90,15 +90,15 @@ services:
   
   backend:
     image: plone/plone-backend:6.0.12
-    deploy:
-      replicas: 3
+    #deploy:
+    #  replicas: 3
     environment:
     #  SITE: Plone
       CORS_ALLOW_ORIGIN: '*'
       ADDONS: "collective.exportimport"
       TZ: America/Rio_Branco
-    #ports:
-    #  - 8080:8080
+    ports:
+      - 8080:8080
     command: >
       start --threads=8
     labels:
