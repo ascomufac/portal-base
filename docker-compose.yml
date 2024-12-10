@@ -87,7 +87,25 @@ services:
       - backend
     volumes:
       - ./frontend/src/addons:/src/addons
-  
+
+  varnish:
+    image: varnish:stable
+    ports:
+      - "8081:80"  # Porta de acesso ao Varnish
+    depends_on:
+      - backend
+    environment:
+      VARNISH_BACKEND_HOST: backend
+      VARNISH_BACKEND_PORT: 8080
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.varnish.rule=Host(`www3.ufac.br`) && PathPrefix(`/editais`)
+      - traefik.http.routers.varnish.entrypoints=websecure
+      - traefik.http.routers.varnish.tls=true
+      - traefik.http.routers.varnish.tls.certresolver=myresolver
+    volumes:
+      - ./default.vcl:/etc/varnish/default.vcl
+      
   backend:
     image: plone/plone-backend:6.0.12
     #deploy:
