@@ -16,12 +16,16 @@ services:
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
       - "--certificatesresolvers.myresolver.acme.email=ascom@ufac.br"
       - "--certificatesresolvers.myresolver.acme.storage=/certs/acme.json"
+      - "--metrics.prometheus=true"
+      - "--metrics.prometheus.entrypoint=web"
+
     labels:
     # Redirecionar HTTP para HTTPS
     - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
     - "traefik.http.routers.http-catchall.rule=Host(`www3.ufac.br`)"
     - "traefik.http.routers.http-catchall.entrypoints=web"
     - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+    
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
