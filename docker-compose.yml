@@ -32,7 +32,7 @@ services:
       - /usr/local/plone/cert:/certs
       
   agencia:
-    image: ghcr.io/plonegovbr/portal:latest
+    image: ghcr.io/ascomufac/portal-agencia-frontend:latest
     ports:
       - '3002:3000'
     restart: always
@@ -52,7 +52,7 @@ services:
       - ./frontend/src/addons:/src/addons
       
   portal:
-    image: ghcr.io/plonegovbr/portal:latest
+    image: ghcr.io/ascomufac/portal-ufac-frontend:latest
     ports:
       - '3001:3000'
     restart: always
@@ -73,7 +73,7 @@ services:
       - ./frontend/src/addons:/src/addons
 
   editais:
-    image: plone/plone-frontend:latest
+    image: ghcr.io/ascomufac/portal-ufac-frontend:latest
     ports:
       - '3003:3000'
     restart: always
