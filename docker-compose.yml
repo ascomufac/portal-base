@@ -52,7 +52,7 @@ services:
       - ./frontend/src/addons:/src/addons
       
   portal:
-    image: ghcr.io/ascomufac/portal-ufac-frontend:latest
+    image: ghcr.io/ascomufac/portal-ufac-volto-frontend:latest
     ports:
       - '3001:3000'
     restart: always
@@ -73,7 +73,7 @@ services:
       - ./frontend/src/addons:/src/addons
 
   editais:
-    image: ghcr.io/ascomufac/portal-ufac-frontend:latest
+    image: ghcr.io/ascomufac/portal-ufac-volo-frontend:latest
     ports:
       - '3003:3000'
     restart: always
