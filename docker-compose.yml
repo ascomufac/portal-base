@@ -52,7 +52,7 @@ services:
       - ./frontend/src/addons:/src/addons
       
   portal:
-    image: ghcr.io/ascomufac/portal-ufac-volto-frontend:latest
+    image: plone/plone-frontend:sha-50e2023-yarn
     ports:
       - '3001:3000'
     restart: always
