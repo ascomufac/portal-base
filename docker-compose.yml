@@ -74,10 +74,10 @@ services:
     container_name: matomo-db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ufac1.capivara
       MYSQL_DATABASE: matomo
-      MYSQL_USER: matomo
-      MYSQL_PASSWORD: matomo
+      MYSQL_USER: capivara
+      MYSQL_PASSWORD: capi.ufac
     volumes:
       - db_data:/var/lib/mysql
 
