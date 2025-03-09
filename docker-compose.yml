@@ -6,18 +6,22 @@ services:
     ports:
       - "80:80"
       - "443:443"
+      - "8082:8082" # Alterando a porta de métricas
 
     command:
-      - "--api.insecure=true"
+      - "--api=true"
+      #- "--api.insecure=true" # Permite acessar o dashboard sem autenticação
+      - "--api.dashboard=true"
       - "--providers.docker=true"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.metrics.address=:8082" 
       - "--entrypoints.websecure.http.tls=true"
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
       - "--certificatesresolvers.myresolver.acme.email=ascom@ufac.br"
       - "--certificatesresolvers.myresolver.acme.storage=/certs/acme.json"
       - "--metrics.prometheus=true"
-      - "--metrics.prometheus.entrypoint=web"
+      - "--metrics.prometheus.entrypoint=metrics"
 
     labels:
     # Redirecionar HTTP para HTTPS
@@ -25,52 +29,57 @@ services:
     - "traefik.http.routers.http-catchall.rule=Host(`www3.ufac.br`)"
     - "traefik.http.routers.http-catchall.entrypoints=web"
     - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
-    
+
+     # Roteador do Traefik para o dashboard
+    - "traefik.http.routers.traefik.rule=Host(`localhost`)"
+    - "traefik.http.routers.traefik.service=api@internal"
+    - "traefik.http.routers.traefik.entrypoints=websecure"
+    - "traefik.http.routers.traefik.tls.certresolver=myresolver"
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /usr/local/plone/cert:/certs
       
-  agencia:
-    image: ghcr.io/ascomufac/portal-agencia-frontend:latest
-    ports:
-      - '3002:3000'
-    restart: always
-    labels:
-      - traefik.enable=true
-      - traefik.http.services.plone-agencia.loadbalancer.server.port=3002
-      - traefik.http.middlewares.gzip.compress=true
-      - traefik.http.routers.agencia.rule=Host(`agencia.localhost`)
-      - traefik.http.routers.agencia.service=plone-agencia
-      - traefik.http.routers.agencia.middlewares=gzip
-    environment:
-      RAZZLE_INTERNAL_API_PATH: http://backend:8080/agencia
-      RAZZLE_DEV_PROXY_API_PATH: http://backend:8080/agencia
-    depends_on:
-      - backend
+  prometheus:
+    image: prom/prometheus:v3.2.1
+    container_name: prometheus
     volumes:
-      - ./frontend/src/addons:/src/addons
-      
-  portal:
-    image: ghcr.io/ascomufac/portal-ufac-volto-frontend:latest
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
-      - '3001:3000'
-    restart: always
-    labels:
-      - traefik.enable=true
-      - traefik.http.services.plone-portal.loadbalancer.server.port=3001
-      - traefik.http.middlewares.gzip.compress=true
-      - traefik.http.routers.portal.rule=Host(`portal.localhost`)
-      - traefik.http.routers.portal.service=plone-portal
-      - traefik.http.routers.portal.middlewares=gzip
-      
-    environment:
-      RAZZLE_INTERNAL_API_PATH: http://backend:8080/portal
-      RAZZLE_DEV_PROXY_API_PATH: http://backend:8080/portal
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
     depends_on:
-      - backend
+      - prometheus
     volumes:
-      - ./frontend/src/addons:/src/addons
+      - grafana_data:/var/lib/grafana
+  
+  matomo:
+    image: matomo
+    container_name: matomo
+    restart: always
+    ports:
+      - "8083:80"
+    volumes:
+      - matomo_data:/var/www/html
+    depends_on:
+      - db
+  
+  db:
+    image: mariadb
+    container_name: matomo-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: matomo
+      MYSQL_USER: matomo
+      MYSQL_PASSWORD: matomo
+    volumes:
+      - db_data:/var/lib/mysql
 
   editais:
     image: ghcr.io/ascomufac/portal-ufac-volto-frontend:latest
@@ -146,3 +155,6 @@ services:
 
 volumes:
   data:
+  grafana_data:
+  matomo_data:
+  db_data:
