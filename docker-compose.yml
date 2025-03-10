@@ -68,16 +68,23 @@ services:
       - matomo_data:/var/www/html
     depends_on:
       - db
-  
+    environment:
+      MATOMO_DATABASE_HOST: db
+      MATOMO_DATABASE_ADAPTER: mysqli
+      MATOMO_DATABASE_USERNAME: capivara
+      MATOMO_DATABASE_PASSWORD: capi.ufac
+      MATOMO_DATABASE_DBNAME: matomo
+
   db:
-    image: mariadb
+    image: mariadb:11.7
     container_name: matomo-db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ufac1.capivara
-      MYSQL_DATABASE: matomo
-      MYSQL_USER: capivara
-      MYSQL_PASSWORD: capi.ufac
+      MARIADB_ROOT_PASSWORD: ufac1.capivara
+      MARIADB_DATABASE: matomo
+      MARIADB_USER: capivara
+      MARIADB_PASSWORD: capi.ufac
+      MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "yes"  # Evita erros de autenticação
     volumes:
       - db_data:/var/lib/mysql
 
@@ -101,6 +108,7 @@ services:
     volumes:
       - ./frontend/src/addons:/src/addons
 
+  #https://grafana.com/grafana/dashboards/9903-varnish/
   varnish:
     image: varnish:stable
     ports:
@@ -125,6 +133,7 @@ services:
     #  replicas: 3
     environment:
     #  SITE: Plone
+    # https://github.com/collective/collective.prometheus
       CORS_ALLOW_ORIGIN: '*'
       ADDONS: "collective.exportimport"
       TZ: America/Rio_Branco
