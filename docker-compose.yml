@@ -36,8 +36,8 @@ services:
     - "traefik.http.routers.traefik.entrypoints=websecure"
     - "traefik.http.routers.traefik.tls.certresolver=myresolver"
     
-    # matomo
-    - "traefik.http.routers.matomo.rule=Host(`www3.ufac.br`)"
+      # Matomo
+    - "traefik.http.routers.matomo.rule=Host(`www3.ufac.br`) && PathPrefix(`/matomo`)"
     - "traefik.http.routers.matomo.entrypoints=websecure"
     - "traefik.http.routers.matomo.tls=true"
     - "traefik.http.services.matomo.loadbalancer.server.port=80"
