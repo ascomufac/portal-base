@@ -7,7 +7,7 @@ services:
       - "80:80"
       - "443:443"
       - "8082:8082" # Alterando a porta de métricas
-      - "8083:8083" # Porta para o Matomo via HTTPS
+      - "8083:8084" # Porta para o Matomo via HTTPS
 
     command:
       - "--api=true"
