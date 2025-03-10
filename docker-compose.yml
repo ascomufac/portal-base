@@ -70,7 +70,7 @@ services:
     container_name: matomo
     restart: always
     ports:
-      - "8084:80"
+      - "8083:80"
     volumes:
       - matomo_data:/var/www/html
     depends_on:
