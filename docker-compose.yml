@@ -83,6 +83,7 @@ services:
       MATOMO_DATABASE_USERNAME: capivara
       MATOMO_DATABASE_PASSWORD: capi.ufac
       MATOMO_DATABASE_DBNAME: matomo
+      MATOMO_URL_PATH: /matomo
     labels:
           - "traefik.enable=true"
           - "traefik.http.routers.matomo.rule=Host(`www3.ufac.br`) && PathPrefix(`/matomo`)"
