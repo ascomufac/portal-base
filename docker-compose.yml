@@ -166,7 +166,7 @@ services:
       - "traefik.http.routers.backend.tls=true"
       - "traefik.http.routers.backend.tls.certresolver=myresolver"
       # Virtual Host Monster configuration
-      - "traefik.http.middlewares.vhm-portal.replacepathregex.regex=^/(.*)"
+      - "traefik.http.middlewares.vhm-portal.replacepathregex.regex=^(?!matomo)(.*)"
       - "traefik.http.middlewares.vhm-portal.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/editais/VirtualHostRoot/$$1"
       - "traefik.http.middlewares.vhm-editais.replacepathregex.regex=^/editais(.*)"
       - "traefik.http.middlewares.vhm-editais.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/editais/VirtualHostRoot/$$1"
