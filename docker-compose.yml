@@ -85,12 +85,12 @@ services:
       MATOMO_DATABASE_DBNAME: matomo
       MATOMO_URL_PATH: /matomo
     labels:
-          - "traefik.enable=true"
-          - "traefik.http.routers.matomo.rule=Host(`www3.ufac.br`) && PathPrefix(`/matomo`)"
-          - "traefik.http.routers.matomo.entrypoints=websecure"
-          - "traefik.http.routers.matomo.tls.certresolver=myresolver"
-          - "traefik.http.middlewares.matomo-strip-prefix.stripprefix.prefixes=/matomo"
-          - "traefik.http.routers.matomo.middlewares=matomo-strip-prefix"
+      - "traefik.enable=true"
+      - "traefik.http.routers.matomo.rule=Host(`www3.ufac.br`) && PathPrefix(`/matomo`)"
+      - "traefik.http.routers.matomo.entrypoints=websecure"
+      - "traefik.http.routers.matomo.tls.certresolver=myresolver"
+      - "traefik.http.middlewares.matomo-strip-prefix.stripprefix.prefixes=/matomo"
+      - "traefik.http.routers.matomo.middlewares=matomo-strip-prefix"
   db:
     image: mariadb:11.7
     container_name: matomo-db
@@ -167,9 +167,6 @@ services:
       - "traefik.http.routers.backend.tls=true"
       - "traefik.http.routers.backend.tls.certresolver=myresolver"
       # Virtual Host Monster configuration
-      # Regra para manter /matomo funcionando corretamente
-      - "traefik.http.middlewares.vhm-matomo.replacepathregex.regex=^/matomo(.*)"
-      - "traefik.http.middlewares.vhm-matomo.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/matomo/VirtualHostRoot/$$1"
 
       # Regra padrão para o site Plone (editais)
       - "traefik.http.middlewares.vhm-portal.replacepathregex.regex=^(.*)"
@@ -182,7 +179,7 @@ services:
       # Aplicação dos middlewares nos roteadores
       - "traefik.http.routers.backend.middlewares=vhm-portal"
       - "traefik.http.routers.editais.middlewares=vhm-editais"
-      - "traefik.http.routers.matomo.middlewares=vhm-matomo"
+      
      
     volumes:
       - data:/data
