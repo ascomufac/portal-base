@@ -89,8 +89,6 @@ services:
       - "traefik.http.routers.matomo.rule=Host(`www3.ufac.br`) && PathPrefix(`/matomo`)"
       - "traefik.http.routers.matomo.entrypoints=websecure"
       - "traefik.http.routers.matomo.tls.certresolver=myresolver"
-      - "traefik.http.middlewares.matomo-strip-prefix.stripprefix.prefixes=/matomo"
-      - "traefik.http.routers.matomo.middlewares=matomo-strip-prefix"
   db:
     image: mariadb:11.7
     container_name: matomo-db
@@ -167,16 +165,10 @@ services:
       - "traefik.http.routers.backend.tls=true"
       - "traefik.http.routers.backend.tls.certresolver=myresolver"
       # Virtual Host Monster configuration
-
-      # Regra padrão para o site Plone (editais)
-      - "traefik.http.middlewares.vhm-portal.replacepathregex.regex=^(.*)"
+      - "traefik.http.middlewares.vhm-portal.replacepathregex.regex=^/(.*)"
       - "traefik.http.middlewares.vhm-portal.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/editais/VirtualHostRoot/$$1"
-
-      # Regra específica para o /editais (pode ser redundante, mas mantém organizado)
       - "traefik.http.middlewares.vhm-editais.replacepathregex.regex=^/editais(.*)"
       - "traefik.http.middlewares.vhm-editais.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/editais/VirtualHostRoot/$$1"
-
-      # Aplicação dos middlewares nos roteadores
       - "traefik.http.routers.backend.middlewares=vhm-portal"
       - "traefik.http.routers.editais.middlewares=vhm-editais"
       
