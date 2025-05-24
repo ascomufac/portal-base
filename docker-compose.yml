@@ -70,7 +70,32 @@ services:
       - prometheus
     volumes:
       - grafana_data:/var/lib/grafana
-  
+
+  loki:
+    image: grafana/loki:2.9.3
+    container_name: loki
+    command: -config.file=/etc/loki/local-config.yaml
+    ports:
+      - "3100:3100"
+    networks:
+      - default
+    volumes:
+      - ./loki-config.yaml:/etc/loki/local-config.yaml
+
+  promtail:
+    image: grafana/promtail:2.9.3
+    container_name: promtail
+    depends_on:
+      - loki
+    command: -config.file=/etc/promtail/promtail.yaml
+    networks:
+      - default
+    volumes:
+      - /var/log:/var/log
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./promtail.yaml:/etc/promtail/promtail.yaml
+
   matomo:
     image: matomo
     container_name: matomo
@@ -145,7 +170,7 @@ services:
     #  SITE: Plone
     # https://github.com/collective/collective.prometheus
       CORS_ALLOW_ORIGIN: '*'
-      ADDONS: "collective.exportimport"
+      #ADDONS: "collective.exportimport"
       TZ: America/Rio_Branco
     ports:
       - 8080:8080
