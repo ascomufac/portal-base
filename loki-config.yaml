@@ -3,6 +3,7 @@ auth_enabled: false
 server:
   http_listen_port: 3100
   grpc_listen_port: 9095
+  log_level: info
 
 ingester:
   lifecycler:
@@ -10,21 +11,12 @@ ingester:
       kvstore:
         store: inmemory
       replication_factor: 1
-    final_sleep: 0s
   chunk_idle_period: 5m
   max_chunk_age: 1h
-  chunk_target_size: 1048576
   chunk_retain_period: 30s
-
-schema_config:
-  configs:
-    - from: 2020-10-15
-      store: boltdb-shipper
-      object_store: filesystem
-      schema: v11
-      index:
-        prefix: index_
-        period: 24h
+  wal:
+    enabled: true
+    dir: /loki/wal
 
 storage_config:
   boltdb_shipper:
@@ -33,6 +25,20 @@ storage_config:
     shared_store: filesystem
   filesystem:
     directory: /loki/chunks
+
+schema_config:
+  configs:
+    - from: 2022-01-01
+      store: boltdb-shipper
+      object_store: filesystem
+      schema: v11
+      index:
+        prefix: index_
+        period: 24h
+
+compactor:
+  working_directory: /loki/compactor
+  shared_store: filesystem
 
 limits_config:
   enforce_metric_name: false
@@ -44,4 +50,17 @@ chunk_store_config:
 
 table_manager:
   retention_deletes_enabled: true
-  retention_period: 168h
+  retention_period: 720h  # 30 dias
+
+ruler:
+  storage:
+    type: local
+    local:
+      directory: /loki/rules
+  rule_path: /loki/rules-temp
+  alertmanager_url: http://localhost:9093
+  ring:
+    kvstore:
+      store: inmemory
+  enable_alertmanager_v2: true
+  enable_api: true
