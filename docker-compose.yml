@@ -38,6 +38,10 @@ services:
     - "traefik.http.routers.traefik.entrypoints=websecure"
     - "traefik.http.routers.traefik.tls.certresolver=myresolver"
     
+    # Middleware de rate limit (pode ser adicionado após outros)
+    - "traefik.http.middlewares.limit-bot.ratelimit.average=5"
+    - "traefik.http.middlewares.limit-bot.ratelimit.burst=10"
+    
       # Matomo
     #- "traefik.http.routers.matomo.rule=Host(`www3.ufac.br`)"
     #- "traefik.http.routers.matomo.entrypoints=websecure"
@@ -146,7 +150,7 @@ services:
     ports:
       - 8080:8080
     command: >
-      start --threads=8
+      start --threads=8 --max-connections=2000
     labels:
       - traefik.enable=true
       - traefik.constraint-label=public
@@ -157,6 +161,7 @@ services:
       - "traefik.http.routers.backend.entrypoints=websecure"
       - "traefik.http.routers.backend.tls=true"
       - "traefik.http.routers.backend.tls.certresolver=myresolver"
+      - "traefik.http.routers.backend.middlewares=vhm-portal,limit-bot"
       # Virtual Host Monster configuration
       - "traefik.http.middlewares.vhm-portal.replacepathregex.regex=^/(.*)"
       - "traefik.http.middlewares.vhm-portal.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/editais/VirtualHostRoot/$$1"
