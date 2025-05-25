@@ -161,11 +161,16 @@ services:
         sh -c "varnishd -F -a :80 -f /etc/varnish/default.vcl & varnishlog -g request"
     labels:
       - traefik.enable=true
-      # Rota principal /editais
+     # Rota principal /editais
       - traefik.http.routers.varnish.rule=Host(`www3.ufac.br`) && PathPrefix(`/editais`)
       - traefik.http.routers.varnish.entrypoints=websecure
       - traefik.http.routers.varnish.tls=true
       - traefik.http.routers.varnish.tls.certresolver=myresolver
+      - traefik.http.routers.varnish.middlewares=https-headers
+
+      # Middleware para corrigir headers HTTPS
+      - traefik.http.middlewares.https-headers.headers.customrequestheaders.X-Forwarded-Proto=https
+      - traefik.http.middlewares.https-headers.headers.customrequestheaders.X-Forwarded-Host=www3.ufac.br
 
       # Rota para raiz → redirecionamento para /editais
       - traefik.http.routers.redirect-root.rule=Host(`www3.ufac.br`) && Path(`/`)
@@ -175,7 +180,7 @@ services:
       - traefik.http.routers.redirect-root.tls.certresolver=myresolver
       - traefik.http.routers.redirect-root.priority=10
 
-      # Middleware para redirecionar raiz → /editais
+      # Middleware de redirecionamento raiz → /editais
       - traefik.http.middlewares.redirect-root-to-editais.redirectregex.regex=^https://www3.ufac.br/$
       - traefik.http.middlewares.redirect-root-to-editais.redirectregex.replacement=https://www3.ufac.br/editais
       - traefik.http.middlewares.redirect-root-to-editais.redirectregex.permanent=true
