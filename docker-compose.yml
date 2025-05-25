@@ -213,6 +213,7 @@ services:
     # https://github.com/collective/collective.prometheus
       CORS_ALLOW_ORIGIN: '*'
       ZOPE_USE_SSL: '1'
+      ZSERVER_HTTPS: 'on'
       #ADDONS: "collective.exportimport"
       TZ: America/Rio_Branco
     ports:
