@@ -171,7 +171,7 @@ services:
   #   networks:
   #     - default
       
-  backend:
+    backend:
     image: plone/plone-backend:6.0.12
     environment:
       CORS_ALLOW_ORIGIN: '*'
@@ -181,14 +181,14 @@ services:
     command: >
       start --threads=8 --max-connections=2000 --asyncore-use-poll
     labels:
-      - traefik.enable=true
-      - traefik.constraint-label=public
+      - "traefik.enable=true"
+      - "traefik.constraint-label=public"
 
       # Serviço apontando para a porta 8080 do container
-      - traefik.http.services.svc-backend.loadbalancer.server.port=8080
+      - "traefik.http.services.svc-backend.loadbalancer.server.port=8080"
 
       # Middleware do Plone (VHM) para montar o site dentro de /editais
-      - "traefik.http.middlewares.vhm-editais.replacepathregex.regex=^/editais(.*)"
+      - "traefik.http.middlewares.vhm-editais.replacepathregex.regex=^/editais/?(.*)"
       - "traefik.http.middlewares.vhm-editais.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/editais/VirtualHostRoot/$$1"
 
       # Roteador principal para acesso via /editais
@@ -196,10 +196,11 @@ services:
       - "traefik.http.routers.backend.entrypoints=websecure"
       - "traefik.http.routers.backend.tls=true"
       - "traefik.http.routers.backend.tls.certresolver=myresolver"
-      - "traefik.http.routers.backend.middlewares=vhm-editais"
+      - "traefik.http.routers.backend.middlewares=vhm-editais@docker"
 
     volumes:
       - data:/data
+
 
 volumes:
   data:
