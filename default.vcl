@@ -6,6 +6,13 @@ backend default {
 }
 
 sub vcl_recv {
+    # Forçar X-Forwarded-Proto para HTTPS
+    if (req.http.X-Forwarded-Proto) {
+        set req.http.X-Forwarded-Proto = "https";
+    } else {
+        add req.http.X-Forwarded-Proto = "https";
+    }
+
     # Permitir PURGE apenas do localhost
     if (req.method == "PURGE") {
         if (client.ip != "127.0.0.1") {
