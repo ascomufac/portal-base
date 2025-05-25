@@ -157,12 +157,8 @@ services:
       - "8081:80"
     depends_on:
       - backend
-    environment:
-      VARNISH_BACKEND_HOST: backend
-      VARNISH_BACKEND_PORT: 8080
     command: >
-      sh -c "varnishd -F -a :80 -b $VARNISH_BACKEND_HOST:$VARNISH_BACKEND_PORT -f /etc/varnish/default.vcl &
-             varnishlog -g request"
+      sh -c "varnishd -F -a :80 -b backend:8080 -f /etc/varnish/default.vcl & varnishlog -g request"
     labels:
       - traefik.enable=true
 
@@ -189,7 +185,7 @@ services:
       - varnish_shared:/var/lib/varnish
 
   varnish-exporter:
-    image: jonnenauha/varnish_exporter:latest
+    image: masv/varnish_exporter
     container_name: varnish-exporter
     command:
       - -web.listen-address=:9131
