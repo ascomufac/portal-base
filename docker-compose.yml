@@ -157,11 +157,8 @@ services:
       - "8081:80"  # Porta de acesso ao Varnish
     depends_on:
       - backend
-    environment:
-      VARNISH_BACKEND_HOST: backend
-      VARNISH_BACKEND_PORT: 8080
     command: >
-      varnishd -F -a :80 -b ${VARNISH_BACKEND_HOST}:${VARNISH_BACKEND_PORT} -f /etc/varnish/default.vcl
+      varnishd -F -a :80 -b backend:8080 -f /etc/varnish/default.vcl
     labels:
       - traefik.enable=true
       - traefik.http.routers.varnish.rule=Host(`www3.ufac.br`) && PathPrefix(`/editais`)
