@@ -185,7 +185,7 @@ services:
       - varnish_shared:/var/lib/varnish
 
   varnish-exporter:
-    image: masv/varnish_exporter
+    image: quay.io/prometheuscommunity/varnish-exporter:latest
     container_name: varnish-exporter
     command:
       - -web.listen-address=:9131
