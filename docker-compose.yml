@@ -39,7 +39,7 @@ services:
     - "traefik.http.routers.traefik.tls.certresolver=myresolver"
 
     # Middleware para Plone/Varnish
-    # - "traefik.http.middlewares.vhm-portal.headers.customrequestheaders.X-VirtualHost-Monster=1"
+    - "traefik.http.middlewares.vhm-portal.headers.customrequestheaders.X-VirtualHost-Monster=1"
 
     # Middleware de proteção contra bots
     - "traefik.http.middlewares.limit-bot.ratelimit.average=5"
@@ -158,10 +158,9 @@ services:
     depends_on:
       - backend
     command: >
-      sh -c "varnishd -F -a :80 -b backend:8080 -f /etc/varnish/default.vcl & varnishlog -g request"
+        sh -c "varnishd -F -a :80 -f /etc/varnish/default.vcl & varnishlog -g request"
     labels:
       - traefik.enable=true
-
       # Rota principal /editais
       - traefik.http.routers.varnish.rule=Host(`www3.ufac.br`) && PathPrefix(`/editais`)
       - traefik.http.routers.varnish.entrypoints=websecure
