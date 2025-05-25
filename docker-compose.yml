@@ -151,24 +151,24 @@ services:
       - traefik.http.routers.editais.middlewares=gzip
 
   #https://grafana.com/grafana/dashboards/9903-varnish/
-  varnish:
-    image: varnish:stable
-    ports:
-      - "8081:80"
-    depends_on:
-      - backend
-    environment:
-      VARNISH_BACKEND_HOST: backend
-      VARNISH_BACKEND_PORT: 8080
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.varnish.rule=Host(`www3.ufac.br`) && PathPrefix(`/editais`)
-      - traefik.http.routers.varnish.entrypoints=websecure
-      - traefik.http.routers.varnish.tls=true
-      - traefik.http.routers.varnish.tls.certresolver=myresolver
-    volumes:
-      - ./default.vcl:/etc/varnish/default.vcl
-      - varnish_shared:/var/lib/varnish
+  # varnish:
+  #   image: varnish:stable
+  #   ports:
+  #     - "8081:80"
+  #   depends_on:
+  #     - backend
+  #   environment:
+  #     VARNISH_BACKEND_HOST: backend
+  #     VARNISH_BACKEND_PORT: 8080
+  #   labels:
+  #     - traefik.enable=true
+  #     - traefik.http.routers.varnish.rule=Host(`www3.ufac.br`) && PathPrefix(`/editais`)
+  #     - traefik.http.routers.varnish.entrypoints=websecure
+  #     - traefik.http.routers.varnish.tls=true
+  #     - traefik.http.routers.varnish.tls.certresolver=myresolver
+  #   volumes:
+  #     - ./default.vcl:/etc/varnish/default.vcl
+  #     - varnish_shared:/var/lib/varnish
 
   # varnish-exporter:
   #   image: quay.io/prometheuscommunity/varnish-exporter:latest
@@ -194,8 +194,6 @@ services:
     #  SITE: Plone
     # https://github.com/collective/collective.prometheus
       CORS_ALLOW_ORIGIN: '*'
-      ZOPE_USE_SSL: '1'
-      ZSERVER_HTTPS: 'on'
       #ADDONS: "collective.exportimport"
       TZ: America/Rio_Branco
     ports:
