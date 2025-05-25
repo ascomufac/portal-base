@@ -10,7 +10,7 @@ sub vcl_recv {
     if (req.http.X-Forwarded-Proto) {
         set req.http.X-Forwarded-Proto = "https";
     } else {
-        add req.http.X-Forwarded-Proto = "https";
+        set req.http.X-Forwarded-Proto = "https";
     }
 
     # Permitir PURGE apenas do localhost
