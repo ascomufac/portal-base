@@ -37,10 +37,16 @@ services:
     - "traefik.http.routers.traefik.service=api@internal"
     - "traefik.http.routers.traefik.entrypoints=websecure"
     - "traefik.http.routers.traefik.tls.certresolver=myresolver"
-    
-    # Middleware de rate limit (pode ser adicionado após outros)
+
+    # Middleware para Plone/Varnish
+    - "traefik.http.middlewares.vhm-portal.headers.customrequestheaders.X-VirtualHost-Monster=1"
+
+    # Middleware de proteção contra bots
     - "traefik.http.middlewares.limit-bot.ratelimit.average=5"
     - "traefik.http.middlewares.limit-bot.ratelimit.burst=10"
+    - "traefik.http.middlewares.block-scrapy.headers.customrequestheaders.User-Agent=BLOCKED"
+    - "traefik.http.routers.backend.middlewares=vhm-portal,limit-bot,block-scrapy"
+
     
       # Matomo
     #- "traefik.http.routers.matomo.rule=Host(`www3.ufac.br`)"
@@ -176,7 +182,7 @@ services:
     ports:
       - 8080:8080
     command: >
-      start --threads=8 --max-connections=2000
+      start --threads=8 --max-connections=2000 --asyncore-use-poll
     labels:
       - traefik.enable=true
       - traefik.constraint-label=public
