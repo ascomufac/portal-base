@@ -207,6 +207,7 @@ services:
     #  SITE: Plone
     # https://github.com/collective/collective.prometheus
       CORS_ALLOW_ORIGIN: '*'
+      ZOPE_USE_SSL: 1
       #ADDONS: "collective.exportimport"
       TZ: America/Rio_Branco
     ports:
