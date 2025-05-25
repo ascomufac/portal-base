@@ -154,17 +154,36 @@ services:
   varnish:
     image: varnish:stable
     ports:
-      - "8081:80"  # Porta de acesso ao Varnish
+      - "8081:80"
     depends_on:
       - backend
+    environment:
+      VARNISH_BACKEND_HOST: backend
+      VARNISH_BACKEND_PORT: 8080
     command: >
-      varnishd -F -a :80 -b backend:8080 -f /etc/varnish/default.vcl
+      sh -c "varnishd -F -a :80 -b $VARNISH_BACKEND_HOST:$VARNISH_BACKEND_PORT -f /etc/varnish/default.vcl &
+             varnishlog -g request"
     labels:
       - traefik.enable=true
+
+      # Rota principal /editais
       - traefik.http.routers.varnish.rule=Host(`www3.ufac.br`) && PathPrefix(`/editais`)
       - traefik.http.routers.varnish.entrypoints=websecure
       - traefik.http.routers.varnish.tls=true
       - traefik.http.routers.varnish.tls.certresolver=myresolver
+
+      # Rota para raiz → redirecionamento para /editais
+      - traefik.http.routers.redirect-root.rule=Host(`www3.ufac.br`) && Path(`/`)
+      - traefik.http.routers.redirect-root.entrypoints=websecure
+      - traefik.http.routers.redirect-root.middlewares=redirect-root-to-editais
+      - traefik.http.routers.redirect-root.tls=true
+      - traefik.http.routers.redirect-root.tls.certresolver=myresolver
+      - traefik.http.routers.redirect-root.priority=10
+
+      # Middleware para redirecionar raiz → /editais
+      - traefik.http.middlewares.redirect-root-to-editais.redirectregex.regex=^https://www3.ufac.br/$
+      - traefik.http.middlewares.redirect-root-to-editais.redirectregex.replacement=https://www3.ufac.br/editais
+      - traefik.http.middlewares.redirect-root-to-editais.redirectregex.permanent=true
     volumes:
       - ./default.vcl:/etc/varnish/default.vcl
       - varnish_shared:/var/lib/varnish
