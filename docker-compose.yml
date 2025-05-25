@@ -184,21 +184,21 @@ services:
       - ./default.vcl:/etc/varnish/default.vcl
       - varnish_shared:/var/lib/varnish
 
-  varnish-exporter:
-    image: quay.io/prometheuscommunity/varnish-exporter:latest
-    container_name: varnish-exporter
-    command:
-      - -web.listen-address=:9131
-      - -varnishstat.path=/usr/bin/varnishstat
-      - -varnishstat.args=-n /var/lib/varnish
-    depends_on:
-      - varnish
-    ports:
-      - "9131:9131"
-    volumes:
-      - varnish_shared:/var/lib/varnish
-    networks:
-      - default
+  # varnish-exporter:
+  #   image: quay.io/prometheuscommunity/varnish-exporter:latest
+  #   container_name: varnish-exporter
+  #   command:
+  #     - -web.listen-address=:9131
+  #     - -varnishstat.path=/usr/bin/varnishstat
+  #     - -varnishstat.args=-n /var/lib/varnish
+  #   depends_on:
+  #     - varnish
+  #   ports:
+  #     - "9131:9131"
+  #   volumes:
+  #     - varnish_shared:/var/lib/varnish
+  #   networks:
+  #     - default
       
   backend:
     image: plone/plone-backend:6.0.12
