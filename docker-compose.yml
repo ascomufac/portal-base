@@ -161,8 +161,7 @@ services:
       VARNISH_BACKEND_HOST: backend
       VARNISH_BACKEND_PORT: 8080
     command: >
-      sh -c "varnishd -F -a :80 -b $VARNISH_BACKEND_HOST:$VARNISH_BACKEND_PORT -f /etc/varnish/default.vcl &
-         varnishlog -g request"
+      varnishd -F -a :80 -b ${VARNISH_BACKEND_HOST}:${VARNISH_BACKEND_PORT} -f /etc/varnish/default.vcl
     labels:
       - traefik.enable=true
       - traefik.http.routers.varnish.rule=Host(`www3.ufac.br`) && PathPrefix(`/editais`)
@@ -171,6 +170,23 @@ services:
       - traefik.http.routers.varnish.tls.certresolver=myresolver
     volumes:
       - ./default.vcl:/etc/varnish/default.vcl
+      - varnish_shared:/var/lib/varnish
+
+  varnish-exporter:
+    image: jonnenauha/varnish_exporter:latest
+    container_name: varnish-exporter
+    command:
+      - -web.listen-address=:9131
+      - -varnishstat.path=/usr/bin/varnishstat
+      - -varnishstat.args=-n /var/lib/varnish
+    depends_on:
+      - varnish
+    ports:
+      - "9131:9131"
+    volumes:
+      - varnish_shared:/var/lib/varnish
+    networks:
+      - default
       
   backend:
     image: plone/plone-backend:6.0.12
@@ -205,7 +221,6 @@ services:
       - "traefik.http.routers.backend.middlewares=vhm-portal"
       - "traefik.http.routers.editais.middlewares=vhm-editais"
       
-     
     volumes:
       - data:/data
 
@@ -214,3 +229,4 @@ volumes:
   grafana_data:
   matomo_data:
   db_data:
+  varnish_shared:
