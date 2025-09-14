@@ -180,6 +180,28 @@ services:
   #     - varnish_shared:/var/lib/varnish
   #   networks:
   #     - default
+  junior:
+    image: ghcr.io/ascomufac/portal-ufac-volto-frontend:latest
+    ports:
+      - '3001:3000'
+    restart: always
+    labels:
+      - traefik.enable=true
+      # Service
+      - traefik.http.services.plone-portal.loadbalancer.server.port=3001
+      # HOST
+      - traefik.http.routers.portal-portal.rule=Host(`portal.localhost`)
+      - traefik.http.routers.portal-portal.entrypoints=websecure
+      - traefik.http.routers.portal-portal.tls=true
+      - traefik.http.routers.portal-portal.tls.certresolver=myresolver
+      - traefik.http.routers.portal-portal.middlewares=gzip
+    environment:
+      RAZZLE_INTERNAL_API_PATH: http://backend:8080/ej
+      RAZZLE_DEV_PROXY_API_PATH: http://backend:8080/ej
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend/src/addons:/src/addons
       
   backend:
     image: plone/plone-backend:6.0.12
