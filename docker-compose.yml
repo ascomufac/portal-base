@@ -24,7 +24,7 @@ services:
       - "--metrics.prometheus.entrypoint=metrics"
       - "--accesslog=true"
       - "--accesslog.filepath=/var/log/traefik/access.log"
-
+      
     labels:
     # Redirecionar HTTP para HTTPS
     - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
@@ -33,8 +33,8 @@ services:
     - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
     
     # Middleware de rate limit (pode ser adicionado após outros)
-    - "traefik.http.middlewares.limit-bot.ratelimit.average=20"
-    - "traefik.http.middlewares.limit-bot.ratelimit.burst=30"
+    # - "traefik.http.middlewares.limit-bot.ratelimit.average=20"
+    # - "traefik.http.middlewares.limit-bot.ratelimit.burst=30"
     
       # Matomo
     #- "traefik.http.routers.matomo.rule=Host(`www3.ufac.br`)"
@@ -128,11 +128,6 @@ services:
       - 8080:8080
     command: >
       start --threads=8 --max-connections=2000
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/++api++/@site"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
     labels:
       - traefik.enable=true
       - traefik.constraint-label=public
