@@ -228,7 +228,6 @@ services:
       # Service
       - traefik.http.services.svc-backend.loadbalancer.server.port=8080
       - traefik.http.middlewares.gzip.compress=true
-      - traefik.http.middlewares.cache-files.headers.customResponseHeaders.Cache-Control=public,max-age=31536000,immutable
       - "traefik.http.routers.backend.rule=Host(`www3.ufac.br`)"
       - "traefik.http.routers.backend.entrypoints=websecure"
       - "traefik.http.routers.backend.tls=true"
