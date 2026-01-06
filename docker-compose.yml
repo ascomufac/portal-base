@@ -31,16 +31,10 @@ services:
     - "traefik.http.routers.http-catchall.rule=Host(`www3.ufac.br`)"
     - "traefik.http.routers.http-catchall.entrypoints=web"
     - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
-
-     # Roteador do Traefik para o dashboard
-    - "traefik.http.routers.traefik.rule=Host(`localhost`)"
-    - "traefik.http.routers.traefik.service=api@internal"
-    - "traefik.http.routers.traefik.entrypoints=websecure"
-    - "traefik.http.routers.traefik.tls.certresolver=myresolver"
     
     # Middleware de rate limit (pode ser adicionado após outros)
-    - "traefik.http.middlewares.limit-bot.ratelimit.average=5"
-    - "traefik.http.middlewares.limit-bot.ratelimit.burst=10"
+    - "traefik.http.middlewares.limit-bot.ratelimit.average=20"
+    - "traefik.http.middlewares.limit-bot.ratelimit.burst=30"
     
       # Matomo
     #- "traefik.http.routers.matomo.rule=Host(`www3.ufac.br`)"
