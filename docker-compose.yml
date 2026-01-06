@@ -53,51 +53,6 @@ services:
       - /usr/local/plone/cert:/certs
       - /usr/local/plone/logs/traefik:/var/log/traefik
 
-      
-  prometheus:
-    image: prom/prometheus:v3.2.1
-    container_name: prometheus
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
-
-  grafana:
-    image: grafana/grafana
-    container_name: grafana
-    ports:
-      - "3000:3000"
-    depends_on:
-      - prometheus
-    volumes:
-      - grafana_data:/var/lib/grafana
-
-  loki:
-    image: grafana/loki:2.9.3
-    container_name: loki
-    command: -config.file=/etc/loki/local-config.yaml
-    ports:
-      - "3100:3100"
-    networks:
-      - default
-    volumes:
-      - ./loki-config.yaml:/etc/loki/local-config.yaml
-      - ./loki-data:/loki
-
-  promtail:
-    image: grafana/promtail:2.9.3
-    container_name: promtail
-    depends_on:
-      - loki
-    command: -config.file=/etc/promtail/promtail.yaml
-    networks:
-      - default
-    volumes:
-      - /var/log:/var/log
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./promtail.yaml:/etc/promtail/promtail.yaml
-
   matomo:
     image: matomo
     container_name: matomo
@@ -164,44 +119,6 @@ services:
   #   volumes:
   #     - ./default.vcl:/etc/varnish/default.vcl
   #     - varnish_shared:/var/lib/varnish
-
-  # varnish-exporter:
-  #   image: quay.io/prometheuscommunity/varnish-exporter:latest
-  #   container_name: varnish-exporter
-  #   command:
-  #     - -web.listen-address=:9131
-  #     - -varnishstat.path=/usr/bin/varnishstat
-  #     - -varnishstat.args=-n /var/lib/varnish
-  #   depends_on:
-  #     - varnish
-  #   ports:
-  #     - "9131:9131"
-  #   volumes:
-  #     - varnish_shared:/var/lib/varnish
-  #   networks:
-  #     - default
-  #junior:
-  #  image: ghcr.io/ascomufac/portal-ufac-volto-frontend:latest
-  #  ports:
-  #    - '3001:3000'
-  #  restart: always
-  #  labels:
-  #    - traefik.enable=true
-  #    # Service
-  #    - traefik.http.services.plone-portal.loadbalancer.server.port=3001
-  #    # HOST
-  #    - traefik.http.routers.portal-portal.rule=Host(`portal.localhost`)
-  #    - traefik.http.routers.portal-portal.entrypoints=websecure
-  #    - traefik.http.routers.portal-portal.tls=true
-  #    - traefik.http.routers.portal-portal.tls.certresolver=myresolver
-  #    - traefik.http.routers.portal-portal.middlewares=gzip
-  #  environment:
-  #    RAZZLE_INTERNAL_API_PATH: http://backend:8080/ej
-  #    RAZZLE_DEV_PROXY_API_PATH: http://backend:8080/ej
-  #  depends_on:
-  #    - backend
-  #  volumes:
-  #    - ./frontend/src/addons:/src/addons
       
   backend:
     image: plone/plone-backend:6.0.12
@@ -248,7 +165,6 @@ services:
 
 volumes:
   data:
-  grafana_data:
   matomo_data:
   db_data:
   varnish_shared:
