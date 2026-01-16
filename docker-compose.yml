@@ -113,15 +113,27 @@ services:
   #   volumes:
   #     - ./default.vcl:/etc/varnish/default.vcl
   #     - varnish_shared:/var/lib/varnish
+  zeo:
+    image: plone/plone-zeo:6.0.12
+    container_name: portal-base-zeo
+    restart: always
+    volumes:
+      - data:/data
+    environment:
+      TZ: America/Rio_Branco
+
       
   backend:
     image: plone/plone-backend:6.0.12
     #deploy:
     # replicas: 3
+    depends_on:
+      - zeo
     environment:
     #  SITE: Plone
     # https://github.com/collective/collective.prometheus
       CORS_ALLOW_ORIGIN: '*'
+      ZEO_ADDRESS: zeo:8100
       #ADDONS: "collective.exportimport"
       TZ: America/Rio_Branco
     #ports:
