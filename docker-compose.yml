@@ -127,7 +127,7 @@ services:
     #ports:
     #  - 8080:8080
     command: >
-      start --threads=8 --max-connections=2000
+      start --threads=12 --max-connections=2000
     labels:
       - traefik.enable=true
       - traefik.constraint-label=public
