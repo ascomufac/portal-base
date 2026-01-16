@@ -124,8 +124,8 @@ services:
       CORS_ALLOW_ORIGIN: '*'
       #ADDONS: "collective.exportimport"
       TZ: America/Rio_Branco
-    ports:
-      - 8080:8080
+    #ports:
+    #  - 8080:8080
     command: >
       start --threads=8 --max-connections=2000
     labels:
