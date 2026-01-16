@@ -114,7 +114,7 @@ services:
   #     - ./default.vcl:/etc/varnish/default.vcl
   #     - varnish_shared:/var/lib/varnish
   zeo:
-    image: plone/plone-zeo:6.0.12
+    image: plone/plone-zeo:6.0
     container_name: portal-base-zeo
     restart: always
     volumes:
