@@ -116,8 +116,8 @@ services:
       
   backend:
     image: plone/plone-backend:6.0.12
-    #deploy:
-    #  replicas: 3
+    deploy:
+     replicas: 3
     environment:
     #  SITE: Plone
     # https://github.com/collective/collective.prometheus
