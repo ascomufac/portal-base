@@ -136,6 +136,7 @@ services:
       ZEO_ADDRESS: zeo:8100
       #ADDONS: "collective.exportimport"
       TZ: America/Rio_Branco
+      BLOB_STORAGE_LAYOUT: bushy
     #ports:
     #  - 8080:8080
     command: >
