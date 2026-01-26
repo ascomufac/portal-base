@@ -31,128 +31,31 @@ services:
     - "traefik.http.routers.http-catchall.rule=Host(`www3.ufac.br`)"
     - "traefik.http.routers.http-catchall.entrypoints=web"
     - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
-    
-    # Middleware de rate limit (pode ser adicionado após outros)
-    # - "traefik.http.middlewares.limit-bot.ratelimit.average=20"
-    # - "traefik.http.middlewares.limit-bot.ratelimit.burst=30"
-    
-      # Matomo
-    #- "traefik.http.routers.matomo.rule=Host(`www3.ufac.br`)"
-    #- "traefik.http.routers.matomo.entrypoints=websecure"
-    #- "traefik.http.routers.matomo.tls=true"
-    #- "traefik.http.services.matomo.loadbalancer.server.port=80"
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /usr/local/plone/cert:/certs
       - /usr/local/plone/logs/traefik:/var/log/traefik
-
-  matomo:
-    image: matomo
-    container_name: matomo
-    restart: always
-    ports:
-     - "8083:80"
-    volumes:
-      - matomo_data:/var/www/html
-    depends_on:
-      - db
-    environment:
-      MATOMO_DATABASE_HOST: matomo-db
-      MATOMO_DATABASE_ADAPTER: mariadb
-      MATOMO_DATABASE_USERNAME: capivara
-      MATOMO_DATABASE_PASSWORD: capi.ufac
-      MATOMO_DATABASE_DBNAME: matomo
-      MATOMO_URL_PATH: /matomo
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.matomo.rule=Host(`www3.ufac.br`) && PathPrefix(`/matomo`)"
-      - "traefik.http.routers.matomo.entrypoints=websecure"
-      - "traefik.http.routers.matomo.tls.certresolver=myresolver"
-  db:
-    image: mariadb:11.7
-    container_name: matomo-db
-    restart: always
-    environment:
-      MARIADB_ROOT_PASSWORD: ufac1.capivara
-      MARIADB_DATABASE: matomo
-      MARIADB_USER: capivara
-      MARIADB_PASSWORD: capi.ufac
-    volumes:
-      - db_data:/var/lib/mysql
-
-  # editais:
-  #   image: ghcr.io/ascomufac/portal-editais-frontend:latest
-  #   ports:
-  #     - '3003:80'
-  #   restart: always
-  #   labels:
-  #     - traefik.enable=true
-  #     - traefik.http.services.plone-editais.loadbalancer.server.port=80
-  #     - traefik.http.middlewares.gzip.compress=true
-  #     - traefik.http.routers.editais.rule=Host(`www3.ufac.br`) && PathPrefix(`/editais`)
-  #     - traefik.http.routers.editais.service=plone-editais
-  #     - traefik.http.routers.editais.middlewares=gzip
-
-  #https://grafana.com/grafana/dashboards/9903-varnish/
-  # varnish:
-  #   image: varnish:stable
-  #   ports:
-  #     - "8081:80"
-  #   depends_on:
-  #     - backend
-  #   environment:
-  #     VARNISH_BACKEND_HOST: backend
-  #     VARNISH_BACKEND_PORT: 8080
-  #   labels:
-  #     - traefik.enable=true
-  #     - traefik.http.routers.varnish.rule=Host(`www3.ufac.br`) && PathPrefix(`/editais`)
-  #     - traefik.http.routers.varnish.entrypoints=websecure
-  #     - traefik.http.routers.varnish.tls=true
-  #     - traefik.http.routers.varnish.tls.certresolver=myresolver
-  #   volumes:
-  #     - ./default.vcl:/etc/varnish/default.vcl
-  #     - varnish_shared:/var/lib/varnish
-  # zeo:
-  #   image: plone/plone-zeo:6.0
-  #   container_name: portal-base-zeo
-  #   restart: always
-  #   volumes:
-  #     - data:/data
-  #   environment:
-  #     TZ: America/Rio_Branco
-
       
   backend:
     image: plone/plone-backend:6.0.12
-    #deploy:
-    # replicas: 3
-    #depends_on:
-    #  - zeo
+    restart: always
     environment:
-    #  SITE: Plone
-    # https://github.com/collective/collective.prometheus
       CORS_ALLOW_ORIGIN: '*'
-    #  ZEO_ADDRESS: zeo:8100
-      #ADDONS: "collective.exportimport"
       TZ: America/Rio_Branco
-    #  ZEO_BLOB_STORAGE_LAYOUT: bushy
-
-    #ports:
-    #  - 8080:8080
     command: >
-      start --threads=12 --max-connections=2000
+      start --threads=12 --max-connections=2500
     labels:
       - traefik.enable=true
       - traefik.constraint-label=public
       # Service
-      - traefik.http.services.svc-backend.loadbalancer.server.port=8080
+      - traefik.http.services.backend.loadbalancer.server.port=8080https://www3.ufac.br/
       - traefik.http.middlewares.gzip.compress=true
       - "traefik.http.routers.backend.rule=Host(`www3.ufac.br`)"
       - "traefik.http.routers.backend.entrypoints=websecure"
       - "traefik.http.routers.backend.tls=true"
       - "traefik.http.routers.backend.tls.certresolver=myresolver"
-      #- "traefik.http.routers.backend.middlewares=vhm-portal,limit-bot"
+      # - "traefik.http.routers.backend.middlewares=vhm-portal,limit-bot"
       - "traefik.http.routers.backend.middlewares=vhm-portal"
       # Virtual Host Monster configuration
       - "traefik.http.middlewares.vhm-portal.replacepathregex.regex=^/(.*)"
@@ -168,6 +71,3 @@ services:
 
 volumes:
   data:
-  matomo_data:
-  db_data:
-  varnish_shared:
