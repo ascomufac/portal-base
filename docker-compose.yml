@@ -1,73 +1,163 @@
 version: "4.1"
+
 services:
   webserver:
     image: traefik:v2.9
+    restart: always
 
     ports:
       - "80:80"
       - "443:443"
-      - "8082:8082" # Alterando a porta de métricas
+      - "8082:8082"
 
     command:
       - "--api=true"
-      #- "--api.insecure=true" # Permite acessar o dashboard sem autenticação
       - "--api.dashboard=true"
       - "--providers.docker=true"
+
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
-      - "--entrypoints.metrics.address=:8082" 
+      - "--entrypoints.metrics.address=:8082"
+
       - "--entrypoints.websecure.http.tls=true"
+
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
       - "--certificatesresolvers.myresolver.acme.email=ascom@ufac.br"
       - "--certificatesresolvers.myresolver.acme.storage=/certs/acme.json"
+
       - "--metrics.prometheus=true"
       - "--metrics.prometheus.entrypoint=metrics"
+
       - "--accesslog=true"
       - "--accesslog.filepath=/var/log/traefik/access.log"
-      
+
     labels:
-    # Redirecionar HTTP para HTTPS
-    - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-    - "traefik.http.routers.http-catchall.rule=Host(`www3.ufac.br`)"
-    - "traefik.http.routers.http-catchall.entrypoints=web"
-    - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+      # HTTP → HTTPS
+      - "traefik.http.routers.http-catchall.rule=Host(`www3.ufac.br`)"
+      - "traefik.http.routers.http-catchall.entrypoints=web"
+      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+
+      # HTTPS / → /editais
+      - "traefik.http.routers.root-redirect.rule=Host(`www3.ufac.br`) && Path(`/`)"
+      - "traefik.http.routers.root-redirect.entrypoints=websecure"
+      - "traefik.http.routers.root-redirect.tls=true"
+      - "traefik.http.routers.root-redirect.middlewares=redirect-to-editais"
+
+      - "traefik.http.middlewares.redirect-to-editais.redirectregex.regex=^https://www3.ufac.br/?$"
+      - "traefik.http.middlewares.redirect-to-editais.redirectregex.replacement=https://www3.ufac.br/editais"
+      - "traefik.http.middlewares.redirect-to-editais.redirectregex.permanent=true"
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /usr/local/plone/cert:/certs
       - /usr/local/plone/logs/traefik:/var/log/traefik
-      
+
   backend:
     image: plone/plone-backend:6.0.12
     restart: always
+
     environment:
       CORS_ALLOW_ORIGIN: '*'
       TZ: America/Rio_Branco
+
     command: >
       start --threads=12 --max-connections=2500
+
     labels:
       - traefik.enable=true
-      - traefik.constraint-label=public
+
       # Service
-      - traefik.http.services.backend.loadbalancer.server.port=8080https://www3.ufac.br/
+      - traefik.http.services.backend.loadbalancer.server.port=8080
       - traefik.http.middlewares.gzip.compress=true
+
+      # Router principal
       - "traefik.http.routers.backend.rule=Host(`www3.ufac.br`)"
       - "traefik.http.routers.backend.entrypoints=websecure"
       - "traefik.http.routers.backend.tls=true"
       - "traefik.http.routers.backend.tls.certresolver=myresolver"
-      # - "traefik.http.routers.backend.middlewares=vhm-portal,limit-bot"
-      - "traefik.http.routers.backend.middlewares=vhm-portal"
-      # Virtual Host Monster configuration
-      - "traefik.http.middlewares.vhm-portal.replacepathregex.regex=^/(.*)"
-      - "traefik.http.middlewares.vhm-portal.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/editais/VirtualHostRoot/$$1"
-      - "traefik.http.middlewares.vhm-editais.replacepathregex.regex=^/editais(.*)"
+      - "traefik.http.routers.backend.middlewares=vhm-editais,gzip"
+
+      # VirtualHostMonster → /editais
+      - "traefik.http.middlewares.vhm-editais.replacepathregex.regex=^/(.*)"
       - "traefik.http.middlewares.vhm-editais.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/editais/VirtualHostRoot/$$1"
-      - "traefik.http.routers.backend.middlewares=vhm-portal"
-      - "traefik.http.routers.editais.middlewares=vhm-editais"
 
     volumes:
       - data:/data
 
-
 volumes:
   data:
+
+# version: "4.1"
+# services:
+#   webserver:
+#     image: traefik:v2.9
+
+#     ports:
+#       - "80:80"
+#       - "443:443"
+#       - "8082:8082" # Alterando a porta de métricas
+
+#     command:
+#       - "--api=true"
+#       #- "--api.insecure=true" # Permite acessar o dashboard sem autenticação
+#       - "--api.dashboard=true"
+#       - "--providers.docker=true"
+#       - "--entrypoints.web.address=:80"
+#       - "--entrypoints.websecure.address=:443"
+#       - "--entrypoints.metrics.address=:8082" 
+#       - "--entrypoints.websecure.http.tls=true"
+#       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+#       - "--certificatesresolvers.myresolver.acme.email=ascom@ufac.br"
+#       - "--certificatesresolvers.myresolver.acme.storage=/certs/acme.json"
+#       - "--metrics.prometheus=true"
+#       - "--metrics.prometheus.entrypoint=metrics"
+#       - "--accesslog=true"
+#       - "--accesslog.filepath=/var/log/traefik/access.log"
+      
+#     labels:
+#     # Redirecionar HTTP para HTTPS
+#     - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+#     - "traefik.http.routers.http-catchall.rule=Host(`www3.ufac.br`)"
+#     - "traefik.http.routers.http-catchall.entrypoints=web"
+#     - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+
+#     volumes:
+#       - /var/run/docker.sock:/var/run/docker.sock:ro
+#       - /usr/local/plone/cert:/certs
+#       - /usr/local/plone/logs/traefik:/var/log/traefik
+      
+#   backend:
+#     image: plone/plone-backend:6.0.12
+#     restart: always
+#     environment:
+#       CORS_ALLOW_ORIGIN: '*'
+#       TZ: America/Rio_Branco
+#     command: >
+#       start --threads=12 --max-connections=2500
+#     labels:
+#       - traefik.enable=true
+#       - traefik.constraint-label=public
+#       # Service
+#       - traefik.http.services.backend.loadbalancer.server.port=8080https://www3.ufac.br/
+#       - traefik.http.middlewares.gzip.compress=true
+#       - "traefik.http.routers.backend.rule=Host(`www3.ufac.br`)"
+#       - "traefik.http.routers.backend.entrypoints=websecure"
+#       - "traefik.http.routers.backend.tls=true"
+#       - "traefik.http.routers.backend.tls.certresolver=myresolver"
+#       # - "traefik.http.routers.backend.middlewares=vhm-portal,limit-bot"
+#       - "traefik.http.routers.backend.middlewares=vhm-portal"
+#       # Virtual Host Monster configuration
+#       - "traefik.http.middlewares.vhm-portal.replacepathregex.regex=^/(.*)"
+#       - "traefik.http.middlewares.vhm-portal.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/editais/VirtualHostRoot/$$1"
+#       - "traefik.http.middlewares.vhm-editais.replacepathregex.regex=^/editais(.*)"
+#       - "traefik.http.middlewares.vhm-editais.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/editais/VirtualHostRoot/$$1"
+#       - "traefik.http.routers.backend.middlewares=vhm-portal"
+#       - "traefik.http.routers.editais.middlewares=vhm-editais"
+
+#     volumes:
+#       - data:/data
+
+
+# volumes:
+#   data:
