@@ -43,10 +43,13 @@ services:
       - "traefik.http.routers.root-redirect.entrypoints=websecure"
       - "traefik.http.routers.root-redirect.tls=true"
       - "traefik.http.routers.root-redirect.middlewares=redirect-to-editais"
+      - "traefik.http.routers.backend.middlewares=vhm-editais,gzip,backend-ratelimit"
 
       - "traefik.http.middlewares.redirect-to-editais.redirectregex.regex=^https://www3.ufac.br/?$"
       - "traefik.http.middlewares.redirect-to-editais.redirectregex.replacement=https://www3.ufac.br/editais"
       - "traefik.http.middlewares.redirect-to-editais.redirectregex.permanent=true"
+      - "traefik.http.middlewares.backend-ratelimit.ratelimit.average=50"
+      - "traefik.http.middlewares.backend-ratelimit.ratelimit.burst=100"
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -63,6 +66,11 @@ services:
     image: plone/plone-backend:6.0.12
     restart: always
 
+    deploy:
+    resources:
+      limits:
+        cpus: "2.0"
+
     environment:
       CORS_ALLOW_ORIGIN: '*'
       ZEO_ADDRESS: zeo:8100
@@ -70,7 +78,7 @@ services:
       
 
     command: >
-      start --threads=12 --max-connections=2500
+      start --threads=16 --max-connections=500
 
     labels:
       - traefik.enable=true
