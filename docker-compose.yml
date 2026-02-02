@@ -66,10 +66,8 @@ services:
     image: plone/plone-backend:6.0.12
     restart: always
 
-    deploy:
-    resources:
-      limits:
-        cpus: "2.0"
+    mem_limit: 4g
+    cpus: 2.0
 
     environment:
       CORS_ALLOW_ORIGIN: '*'
