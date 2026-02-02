@@ -69,10 +69,10 @@ services:
       ZEO_ADDRESS: zeo:8100
       WAITRESS_THREADS: 4
       TZ: America/Rio_Branco
-   deploy:
-    resources:
-      limits:
-        cpus: "2.0"
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
     
 
     command: >
