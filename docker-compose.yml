@@ -1,6 +1,7 @@
 version: "4.1"
 
 services:
+
   webserver:
     image: traefik:v2.9
     restart: always
@@ -47,62 +48,56 @@ services:
       - "traefik.http.middlewares.redirect-to-editais.redirectregex.regex=^https://www3.ufac.br/?$"
       - "traefik.http.middlewares.redirect-to-editais.redirectregex.replacement=https://www3.ufac.br/editais"
       - "traefik.http.middlewares.redirect-to-editais.redirectregex.permanent=true"
-      - "traefik.http.middlewares.backend-ratelimit.ratelimit.average=50"
-      - "traefik.http.middlewares.backend-ratelimit.ratelimit.burst=100"
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /usr/local/plone/cert:/certs
       - /usr/local/plone/logs/traefik:/var/log/traefik
-  
+
+  varnish:
+    image: varnish:7.4
+    restart: always
+    depends_on:
+      - backend
+    volumes:
+      - ./varnish.vcl:/etc/varnish/default.vcl:ro
+    command: >
+      varnishd -F
+      -f /etc/varnish/default.vcl
+      -s malloc,1g
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.varnish.rule=Host(`www3.ufac.br`)"
+      - "traefik.http.routers.varnish.entrypoints=websecure"
+      - "traefik.http.routers.varnish.tls=true"
+      - "traefik.http.routers.varnish.tls.certresolver=myresolver"
+      - "traefik.http.services.varnish.loadbalancer.server.port=80"
+
   zeo:
     image: plone/plone-zeo:6.0
     restart: always
     volumes:
       - data:/data
-      
+
   backend:
     image: plone/plone-backend:6.0.12
     restart: always
+
     environment:
       CORS_ALLOW_ORIGIN: '*'
       ZEO_ADDRESS: zeo:8100
       WAITRESS_THREADS: 4
       TZ: America/Rio_Branco
-    deploy:
-      resources:
-        limits:
-          cpus: "2.0"
-    
 
     command: >
-      start --threads=16 --max-connections=500
+      start --threads=8 --max-connections=300
 
-    labels:
-      - traefik.enable=true
-
-      # Service
-      - traefik.http.services.backend.loadbalancer.server.port=8080
-      - traefik.http.middlewares.gzip.compress=true
-
-      # Router principal
-      - "traefik.http.routers.backend.rule=Host(`www3.ufac.br`)"
-      - "traefik.http.routers.backend.entrypoints=websecure"
-      - "traefik.http.routers.backend.tls=true"
-      - "traefik.http.routers.backend.tls.certresolver=myresolver"
-      - "traefik.http.routers.backend.middlewares=vhm-editais,gzip"
-
-      # VirtualHostMonster → /editais
-      - "traefik.http.middlewares.vhm-editais.replacepathregex.regex=^/(.*)"
-      - "traefik.http.middlewares.vhm-editais.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/editais/VirtualHostRoot/$$1"
-    
     depends_on:
-          - zeo
-    #volumes:
-    #  - data:/data
+      - zeo
 
 volumes:
   data:
+
 
 # version: "4.1"
 # services:
