@@ -52,14 +52,22 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /usr/local/plone/cert:/certs
       - /usr/local/plone/logs/traefik:/var/log/traefik
-
+  
+  zeo:
+    image: plone/plone-zeo:6.0.12
+    restart: always
+    volumes:
+      - data:/data
+      
   backend:
     image: plone/plone-backend:6.0.12
     restart: always
 
     environment:
       CORS_ALLOW_ORIGIN: '*'
+      ZEO_ADDRESS: zeo:8100
       TZ: America/Rio_Branco
+      
 
     command: >
       start --threads=12 --max-connections=2500
@@ -81,9 +89,11 @@ services:
       # VirtualHostMonster → /editais
       - "traefik.http.middlewares.vhm-editais.replacepathregex.regex=^/(.*)"
       - "traefik.http.middlewares.vhm-editais.replacepathregex.replacement=/VirtualHostBase/https/www3.ufac.br/editais/VirtualHostRoot/$$1"
-
-    volumes:
-      - data:/data
+    
+    depends_on:
+          - zeo
+    #volumes:
+    #  - data:/data
 
 volumes:
   data:
