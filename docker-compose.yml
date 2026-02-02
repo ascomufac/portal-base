@@ -43,7 +43,6 @@ services:
       - "traefik.http.routers.root-redirect.entrypoints=websecure"
       - "traefik.http.routers.root-redirect.tls=true"
       - "traefik.http.routers.root-redirect.middlewares=redirect-to-editais"
-      - "traefik.http.routers.backend.middlewares=vhm-editais,gzip,backend-ratelimit"
 
       - "traefik.http.middlewares.redirect-to-editais.redirectregex.regex=^https://www3.ufac.br/?$"
       - "traefik.http.middlewares.redirect-to-editais.redirectregex.replacement=https://www3.ufac.br/editais"
@@ -65,10 +64,6 @@ services:
   backend:
     image: plone/plone-backend:6.0.12
     restart: always
-
-    mem_limit: 4g
-    cpus: 2.0
-
     environment:
       CORS_ALLOW_ORIGIN: '*'
       ZEO_ADDRESS: zeo:8100
