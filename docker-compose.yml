@@ -67,8 +67,13 @@ services:
     environment:
       CORS_ALLOW_ORIGIN: '*'
       ZEO_ADDRESS: zeo:8100
+      WAITRESS_THREADS: 4
       TZ: America/Rio_Branco
-      
+   deploy:
+    resources:
+      limits:
+        cpus: "2.0"
+    
 
     command: >
       start --threads=16 --max-connections=500
