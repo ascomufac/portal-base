@@ -54,7 +54,7 @@ services:
       - /usr/local/plone/logs/traefik:/var/log/traefik
   
   zeo:
-    image: plone/plone-zeo:6.0.12
+    image: plone/plone-zeo:6.0
     restart: always
     volumes:
       - data:/data
