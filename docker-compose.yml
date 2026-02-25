@@ -96,23 +96,23 @@ services:
       - zeo
 
   backend-admin:
-  image: plone/plone-backend:6.0.12
-  restart: always
-
-  ports:
-    - "127.0.0.1:8080:8080"
-
-  environment:
-    CORS_ALLOW_ORIGIN: '*'
-    ZEO_ADDRESS: zeo:8100
-    WAITRESS_THREADS: 2
-    TZ: America/Rio_Branco
-
-  command: >
-    start --threads=4 --max-connections=100
-
-  depends_on:
-    - zeo
+    image: plone/plone-backend:6.0.12
+    restart: always
+  
+    ports:
+      - "127.0.0.1:8080:8080"
+  
+    environment:
+      CORS_ALLOW_ORIGIN: '*'
+      ZEO_ADDRESS: zeo:8100
+      WAITRESS_THREADS: 2
+      TZ: America/Rio_Branco
+  
+    command: >
+      start --threads=4 --max-connections=100
+  
+    depends_on:
+      - zeo
 
 volumes:
   data:
