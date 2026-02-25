@@ -83,6 +83,9 @@ services:
     image: plone/plone-backend:6.0.12
     restart: always
 
+    ports:
+    - "127.0.0.1:8080:8080" 
+
     environment:
       CORS_ALLOW_ORIGIN: '*'
       ZEO_ADDRESS: zeo:8100
