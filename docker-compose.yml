@@ -101,15 +101,7 @@ services:
       - '3003:3000'
     restart: always
     labels:
-      - traefik.enable=true
-      # Service
-      - traefik.http.services.plone-editais.loadbalancer.server.port=3003
-      # HOST
-      - traefik.http.routers.portal-editais.rule=Host(`www3.ufac.br`)
-      - traefik.http.routers.portal-editais.entrypoints=websecure
-      - traefik.http.routers.portal-editais.tls=true
-      - traefik.http.routers.portal-editais.tls.certresolver=myresolver
-      - traefik.http.routers.portal-editais.middlewares=gzip
+      - traefik.enable=false
     environment:
       RAZZLE_INTERNAL_API_PATH: http://backend:8080/editais
       RAZZLE_API_PATH: http://www3.ufac.br/editais
