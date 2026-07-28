@@ -94,6 +94,30 @@ services:
 
     depends_on:
       - zeo
+  
+  editais:
+    image: ghcr.io/ascomufac/portal-editais-frontend:latest
+    ports:
+      - '3003:3000'
+    restart: always
+    labels:
+      - traefik.enable=true
+      # Service
+      - traefik.http.services.plone-editais.loadbalancer.server.port=3003
+      # HOST
+      - traefik.http.routers.portal-editais.rule=Host(`www3.ufac.br`)
+      - traefik.http.routers.portal-editais.entrypoints=websecure
+      - traefik.http.routers.portal-editais.tls=true
+      - traefik.http.routers.portal-editais.tls.certresolver=myresolver
+      - traefik.http.routers.portal-editais.middlewares=gzip
+    environment:
+      RAZZLE_INTERNAL_API_PATH: http://backend:8080/editais
+      RAZZLE_API_PATH: http://www3.ufac.br/editais
+      RAZZLE_DEV_PROXY_API_PATH: http://backend:8080/editais
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend/src/addons:/src/addons
 
   backend-admin:
     image: plone/plone-backend:6.0.12
