@@ -98,7 +98,7 @@ services:
   editais:
     image: ghcr.io/ascomufac/portal-editais-frontend:latest
     ports:
-      - '3003:80'
+      - '3003:8080'
     restart: always
     labels:
       - traefik.enable=false
