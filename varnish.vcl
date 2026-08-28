@@ -13,8 +13,13 @@ backend default {
 ############################
 sub vcl_recv {
 
-    # VirtualHostMonster para Plone (/editais)
-    if (req.http.host == "www3.ufac.br") {
+    # Publica o objeto Plone /portal no caminho externo /portal.
+    if (req.http.host == "www3.ufac.br" && req.url ~ "^/portal(/|$)") {
+        set req.url = "/VirtualHostBase/https/www3.ufac.br/portal/VirtualHostRoot/_vh_portal" +
+            regsub(req.url, "^/portal", "");
+    }
+    # Demais caminhos continuam atendidos pelo site /editais.
+    else if (req.http.host == "www3.ufac.br") {
         set req.url = "/VirtualHostBase/https/www3.ufac.br/editais/VirtualHostRoot" + req.url;
     }
 

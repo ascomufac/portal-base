@@ -111,6 +111,22 @@ services:
     volumes:
       - ./frontend/src/addons:/src/addons
 
+  portal:
+    image: ghcr.io/ascomufac/novo-portal-ufac-frontend:latest
+    ports:
+      - '3001:4000'
+    restart: always
+    labels:
+      - traefik.enable=false
+    environment:
+      RAZZLE_INTERNAL_API_PATH: http://backend:8080/portal
+      RAZZLE_API_PATH: http://www3.ufac.br/portal
+      RAZZLE_DEV_PROXY_API_PATH: http://backend:8080/portal
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend/src/addons:/src/addons
+
   backend-admin:
     image: plone/plone-backend:6.0.12
     restart: always
