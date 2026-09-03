@@ -13,8 +13,14 @@ backend default {
 ############################
 sub vcl_recv {
 
+    # Publica o site Plone /pages no caminho externo /pages.
+    # Mantém ++api++ disponível, por exemplo: /pages/++api++/mnpef.
+    if (req.http.host == "www3.ufac.br" && req.url ~ "^/pages(/|$)") {
+        set req.url = "/VirtualHostBase/https/www3.ufac.br/pages/VirtualHostRoot/_vh_pages" +
+            regsub(req.url, "^/pages", "");
+    }
     # Publica o objeto Plone /portal no caminho externo /portal.
-    if (req.http.host == "www3.ufac.br" && req.url ~ "^/portal(/|$)") {
+    else if (req.http.host == "www3.ufac.br" && req.url ~ "^/portal(/|$)") {
         set req.url = "/VirtualHostBase/https/www3.ufac.br/portal/VirtualHostRoot/_vh_portal" +
             regsub(req.url, "^/portal", "");
     }
@@ -36,12 +42,20 @@ sub vcl_recv {
         return (pass);
     }
 
-    if (req.url ~ "^/(@@|\\+\\+api\\+\\+|login|logout|acl_users)") {
+    if (req.url ~ "(/|^)(@@|\\+\\+api\\+\\+|login|logout|acl_users)(/|$)" ||
+        req.http.Accept ~ "application/json") {
         return (pass);
     }
 
     unset req.http.Cookie;
     return (hash);
+}
+
+sub vcl_hash {
+    hash_data(req.url);
+    if (req.http.Accept) {
+        hash_data(req.http.Accept);
+    }
 }
 
 
